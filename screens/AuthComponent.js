@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     color: '#222'
   },
   button: {
-    backgroundColor: '#ff3d00',
+    backgroundColor: 'red',
     paddingVertical: 13,
     borderRadius: 12,
     alignItems: 'center',
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   buttonDisabled: {
-    backgroundColor: '#ffab91',
+    backgroundColor: '#cfa6a6',
   },
   buttonText: {
     color: '#fff', fontWeight: 'bold', fontSize: 16, letterSpacing: 0.7, textTransform: 'uppercase'

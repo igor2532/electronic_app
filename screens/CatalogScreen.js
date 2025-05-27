@@ -111,7 +111,7 @@ export default function CatalogScreen({ route, navigation }) {
           <Animated.View entering={FadeInUp} style={{ marginBottom: 10 }}>
             <ProductCard
               product={item}
-              onPress={() => navigation.navigate('ProductDetails', { product: item })}
+              onPress={() => navigation.navigate('ProductDetailsScreen', { product: item })}
             />
           </Animated.View>
         )}

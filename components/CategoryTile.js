@@ -2,14 +2,19 @@ import React, { useEffect } from 'react';
 import { TouchableOpacity, Text, StyleSheet, View, Image, ImageBackground } from 'react-native';
 
 export default function CategoryTile({ category, onPress }) {
-     
     return (
         <TouchableOpacity onPress={onPress}  style={styles.tile}>
             {category.image && (
-                // <Image source={{ uri: category.image.src }} style={styles.image} />
-                <ImageBackground style={styles.imageBackground} source={{ uri: category.image.src }} resizeMode="cover" >
+                <ImageBackground style={styles.imageBackground} source={{ uri:category.image.src}} resizeMode="cover" >
                    <View style= {{margin:'0 auto'}}>
-                   <Text style={styles.text}>{category.name}</Text>
+                   <Text style={styles.text}>{category.name} {category.image==null}</Text>
+                    </View> 
+                </ImageBackground>
+            )}
+         {!category.image && (
+                <ImageBackground style={styles.imageBackground} source={require('../assets/no-image.jpg')} resizeMode="cover" >
+                   <View style= {{margin:'0 auto'}}>
+                   <Text style={styles.text}>{category.name} </Text>
                     </View> 
                 </ImageBackground>
             )}

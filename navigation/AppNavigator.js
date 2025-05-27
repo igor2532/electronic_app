@@ -7,6 +7,9 @@ import HomeScreen from '../screens/HomeScreen';
 import CatalogScreen from '../screens/CatalogScreen';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
 import SearchScreen from '../screens/SearchScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import EditProfileScreen from '../screens/EditProfileScreen';
+import FavoritesScreen from '../screens/FavoritesScreen';
 import AuthComponent from '../screens/AuthComponent';
 import { TouchableOpacity, View, Text, StyleSheet, Linking, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -128,6 +131,51 @@ function AuthStack() {
     </Stack.Navigator>
   );
 }
+
+
+function FavoritesStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="FavoritesScreen"
+        component={FavoritesScreen}
+        options={({ navigation }) => ({
+          title: 'Хочу купить',
+          headerRight: () => <IconsView navigation={navigation} />,
+          headerLeft: () => <IconsMenu navigation={navigation} />,
+        })}
+      />
+    </Stack.Navigator>
+  );
+}
+
+
+function ProfileStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="ProfileScreen"
+        component={ProfileScreen}
+        options={({ navigation }) => ({
+          title: 'Профиль',
+          headerRight: () => <IconsView navigation={navigation} />,
+          headerLeft: () => <IconsMenu navigation={navigation} />,
+        })}
+      />
+      <Stack.Screen
+        name="EditProfileScreen"
+        component={EditProfileScreen}
+        options={({ navigation }) => ({
+          title: 'Редактировать профиль',
+          headerRight: () => <IconsView navigation={navigation} />,
+          headerLeft: () => <IconsMenu navigation={navigation} />,
+        })}
+      />
+    </Stack.Navigator>
+  );
+}
+
+
 
 function MainStack() {
   const { user } = useContext(MyContext);
@@ -259,10 +307,11 @@ export default function AppNavigator() {
       <Drawer.Screen name="Доставка" component={DileveryStack} />
       <Drawer.Screen name="О нас/Контакты" component={AboutStack} />
       {!user && <Drawer.Screen name="Авторизация" component={AuthStack} />}
+      {user && <Drawer.Screen name="Профиль" component={ProfileStack} />}
+       {user && <Drawer.Screen name="Хочу купить" component={FavoritesStack} />}
     </Drawer.Navigator>
   );
 }
-
 // -------------------- STYLES --------------------
 
 const styles = StyleSheet.create({

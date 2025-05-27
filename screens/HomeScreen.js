@@ -35,7 +35,7 @@ export default function HomeScreen({ navigation }) {
         <Animated.View entering={FadeInDown} style={styles.animatedWrap}>
           <CategoryTile
             category={item}
-            onPress={() => navigation.navigate('Catalog', { categoryId: item.id })}
+            onPress={() => navigation.navigate('CatalogScreen', { categoryId: item.id })}
           />
         </Animated.View>
       )}

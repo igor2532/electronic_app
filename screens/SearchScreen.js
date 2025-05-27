@@ -1,42 +1,64 @@
-//#
-import React, { useState } from 'react';
-import { View, TextInput, FlatList, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import debounce from 'lodash.debounce';
 import { api } from '../utils/api';
+import ProductCard from '../components/ProductCard';
+import SearchBar from '../components/SearchBar';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 
 export default function SearchScreen({ navigation }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleSearch = async () => {
-    const res = await api.search(query);
-    setResults(res || []);
+  const searchProducts = async (text) => {
+    if (!text || text.length < 2) {
+      setResults([]);
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await api.get(`/products?search=${text}`);
+      setResults(res.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Обернутый debounced поиск
+  const debouncedSearch = useCallback(debounce(searchProducts, 500), []);
+
+  const handleChangeText = (text) => {
+    setQuery(text);
+    debouncedSearch(text);
   };
 
   return (
-    <View style={{ flex: 1, padding: 16 }}>
-      <TextInput
-        style={styles.input}
-        placeholder="Введите запрос..."
-        value={query}
-        onChangeText={setQuery}
-        onSubmitEditing={handleSearch}
-      />
+    <View style={{ flex: 1, padding: 10 }}>
+      <SearchBar value={query} onChangeText={handleChangeText} />
+
+      {loading && <ActivityIndicator size="large" color="#007AFF" style={styles.loader} />}
+
       <FlatList
         data={results}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.item} onPress={() => {/* навигация по типу объекта */}}>
-            <Text style={styles.title}>{item.name || item.title}</Text>
-            <Text style={styles.sub}>{item.description || item.email}</Text>
-          </TouchableOpacity>
+          <Animated.View entering={FadeInUp}>
+            <ProductCard
+              product={item}
+              onPress={() => navigation.navigate('ProductDetailsScreen', { product: item })}
+            />
+          </Animated.View>
         )}
       />
     </View>
   );
 }
+
 const styles = StyleSheet.create({
-  input: { borderColor: '#ccc', borderWidth: 1, borderRadius: 8, padding: 10, marginBottom: 15 },
-  item: { backgroundColor: '#fff', borderRadius: 7, padding: 10, marginBottom: 7 },
-  title: { fontWeight: 'bold', fontSize: 15 },
-  sub: { color: '#777' }
+  loader: {
+    marginVertical: 20,
+  },
 });
