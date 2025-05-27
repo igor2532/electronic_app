@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "electronic_app",
+    "name": "Торговый дом - Электроник",
     "slug": "electronic_app",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -16,13 +16,27 @@
       "supportsTablet": true
     },
     "android": {
+      "versionCode": 2,
+      "enableProguardInReleaseBuilds": false,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.sivgdpot.electronic_app"
+    },
+    "updates": {
+      "enabled": false
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6c2e0b3c-0499-4463-bf0b-ad4084173ec9"
+      }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }
