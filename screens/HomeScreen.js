@@ -1,21 +1,33 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, FlatList, StyleSheet, ActivityIndicator, Text, TextInput, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { View, FlatList, StyleSheet, ActivityIndicator, Text, TextInput, TouchableOpacity, Image, Dimensions,useWindowDimensions  } from 'react-native';
 import { api } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { MyContext } from '../navigation/Context';
 import Swiper from 'react-native-swiper';
+import FooterBar from './FooterBar';
 
 const screenWidth = Dimensions.get('window').width;
 const ITEM_MARGIN = 12;
 const ITEM_WIDTH = (screenWidth - 3 * ITEM_MARGIN) / 2;
 
 export default function HomeScreen({ navigation }) {
+   const {
+  user,
+  setUser,
+  logout,
+  width,
+  height,
+  isLandscape,
+  numColumns,
+  ITEM_WIDTH,
+  ITEM_MARGIN
+} = useContext(MyContext);
+
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [search, setSearch] = useState('');
-
   useEffect(() => {
     api.get('/products/categories?per_page=100')
       .then(res => setCategories(res.data.filter(cat => cat.count > 0)))
@@ -42,7 +54,7 @@ export default function HomeScreen({ navigation }) {
   );
 
   const renderProduct = ({ item }) => (
-    <Animated.View entering={FadeInDown} style={styles.productWrap}>
+    <Animated.View entering={FadeInDown} style={[styles.productWrap, { width: ITEM_WIDTH }]}>
       <ProductCard
         product={item}
         onPress={() => navigation.navigate('ProductDetailsScreen', { product: item })}
@@ -95,19 +107,33 @@ export default function HomeScreen({ navigation }) {
   );
 
   return (
+    <>
     <View style={styles.root}>
       <FlatList
+
+      
+
         ListHeaderComponent={<ListHeader />}
         data={products}
         keyExtractor={item => item.id.toString()}
         renderItem={renderProduct}
-        numColumns={2}
-        columnWrapperStyle={styles.row}
+        key={numColumns}
+       numColumns={numColumns}
+  columnWrapperStyle={{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: ITEM_MARGIN,
+  }}
+        // columnWrapperStyle={styles.row}
         ListEmptyComponent={loadingProducts ? <ActivityIndicator style={{ marginTop: 50 }} size="large" color="#1E90FF" /> : null}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
       />
     </View>
+    
+    </>
+    
+    
   );
 }
 

@@ -12,11 +12,12 @@ import ProfileScreen from '../screens/ProfileScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import FavoritesScreen from '../screens/FavoritesScreen';
 import AuthComponent from '../screens/AuthComponent';
+import FooterBar from '../screens/FooterBar';
+import { StatusBar } from 'expo-status-bar';
 import NewProductsScreen from '../screens/NewProductsScreen';
 import { TouchableOpacity, View, Text, StyleSheet, Linking, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { MyContext } from '../navigation/Context';
-
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
@@ -60,18 +61,21 @@ const IconsMenu = ({ navigation }) => (
 // -------------------- STACKS --------------------
 function NewProductsStack() {
   return (
+    <>
     <Stack.Navigator>
       <Stack.Screen
         name="NewProductsScreen"
         component={NewProductsScreen}
         options={({ navigation }) => ({
           title: 'Новые поступления',
+            headerShown: false ,
           headerTitleStyle: { fontSize: 18, color: '#1E90FF' },
           headerRight: () => <IconsView navigation={navigation} />,
           headerLeft: () => <IconsMenu navigation={navigation} />,
         })}
       />
     </Stack.Navigator>
+    <FooterBar /></>
   );
 }
 function DileveryScreen({ navigation }) {
@@ -79,24 +83,28 @@ function DileveryScreen({ navigation }) {
     navigation.setOptions({ title: 'Доставка и оплата' });
   }, []);
   return (
+    <>
     <View style={styles.dilevery}>
-      <View style={{ marginTop: 20, marginBottom: 10 }}>
+      <View style={{ marginTop: 50, marginBottom: 10 }}>
         <Image style={styles.dileveryImage} source={require('../assets/dostavka-edy.jpg')} />
       </View>
       <View>
         <Text style={styles.dileveryText}>У нас бесплатная доставка</Text>
       </View>
     </View>
+    <FooterBar /></>
   );
 }
 
 function AboutStack() {
   return (
+    <>
     <Stack.Navigator>
       <Stack.Screen
         name="AboutScreen"
         component={AboutScreen}
         options={({ navigation }) => ({
+            headerShown: false ,
           headerStyle: { backgroundColor: '#191B22' },
           headerTitleStyle: { fontSize: 19, color: '#fff' },
           title: 'Контакты',
@@ -105,16 +113,19 @@ function AboutStack() {
         })}
       />
     </Stack.Navigator>
+    <FooterBar /></>
   );
 }
 
 function AuthStack() {
   return (
+    <>
     <Stack.Navigator>
       <Stack.Screen
         name="AuthScreen"
         component={AuthComponent}
         options={({ navigation }) => ({
+            headerShown: false ,
             headerStyle: { backgroundColor: '#191B22' },
          headerTitleStyle: { fontSize: 19, color: '#fff'},
           title: 'Авторизация',
@@ -123,17 +134,20 @@ function AuthStack() {
         })}
       />
     </Stack.Navigator>
+    <FooterBar /></>
   );
 }
 
 
 function FavoritesStack() {
   return (
+    <>
     <Stack.Navigator>
       <Stack.Screen
         name="FavoritesScreen"
         component={FavoritesScreen}
         options={({ navigation }) => ({
+            headerShown: false ,
             headerStyle: { backgroundColor: '#191B22' },
          headerTitleStyle: { fontSize: 19, color: '#fff'},
           title: 'Хочу купить',
@@ -142,17 +156,20 @@ function FavoritesStack() {
         })}
       />
     </Stack.Navigator>
+    <FooterBar /></>
   );
 }
 
 
 function ProfileStack() {
   return (
+    <>
     <Stack.Navigator>
       <Stack.Screen
         name="ProfileScreen"
         component={ProfileScreen}
         options={({ navigation }) => ({
+            headerShown: false ,
         headerStyle: { backgroundColor: '#191B22' },
          headerTitleStyle: { fontSize: 19, color: '#fff'},
           title: 'Профиль',
@@ -164,6 +181,7 @@ function ProfileStack() {
         name="EditProfileScreen"
         component={EditProfileScreen}
         options={({ navigation }) => ({
+            headerShown: false ,
           headerStyle: { backgroundColor: '#191B22' },
           headerTitleStyle: { fontSize: 19, color: '#fff'},
           title: 'Редактировать профиль',
@@ -172,6 +190,7 @@ function ProfileStack() {
         })}
       />
     </Stack.Navigator>
+    <FooterBar /></>
   );
 }
 
@@ -181,11 +200,13 @@ function MainStack() {
   const { user } = useContext(MyContext);
 
   return (
+    <>
     <Stack.Navigator>
       <Stack.Screen
         name="HomeScreen"
         component={HomeScreen}
         options={({ navigation }) => ({
+           headerShown: false ,
              headerStyle: { backgroundColor: '#191B22' },
           headerTitleStyle: { fontSize: 19, color: '#fff'},
           title: 'Торговый дом - Электроник',
@@ -197,6 +218,7 @@ function MainStack() {
         name="CatalogScreen"
         component={CatalogScreen}
         options={({ navigation }) => ({
+           headerShown: false ,
            headerStyle: { backgroundColor: '#191B22' },
           headerTitleStyle: { fontSize: 19, color: '#fff'},
           title: 'Каталог',
@@ -208,6 +230,7 @@ function MainStack() {
         name="ProductDetailsScreen"
         component={ProductDetailsScreen}
         options={({ navigation, route }) => ({
+            headerShown: false ,
            headerStyle: { backgroundColor: '#191B22' },
           headerTitleStyle: { fontSize: 19, color: '#fff'},
           title: route.params?.product?.name?.slice(0, 20) || 'Товар',
@@ -219,6 +242,7 @@ function MainStack() {
         name="SearchScreen"
         component={SearchScreen}
         options={({ navigation }) => ({
+            headerShown: false ,
               headerStyle: { backgroundColor: '#191B22' },
           headerTitleStyle: { fontSize: 19, color: '#fff'},
           title: 'Поиск',
@@ -230,6 +254,7 @@ function MainStack() {
   name="NewProductsScreen"
   component={NewProductsScreen}
   options={({ navigation }) => ({
+      headerShown: false ,
      headerStyle: { backgroundColor: '#191B22' },
           headerTitleStyle: { fontSize: 19, color: '#fff'},
     title: 'Новые поступления',
@@ -239,16 +264,20 @@ function MainStack() {
 />
       {/* Здесь больше нет дублирующего "Авторизация" */}
     </Stack.Navigator>
+    <FooterBar /></>
   );
 }
 
 function DileveryStack() {
   return (
+    <>
+  
     <Stack.Navigator>
       <Stack.Screen
         name="DileveryScreen"
         component={DileveryScreen}
         options={({ navigation }) => ({
+          headerShown: false ,
            headerStyle: { backgroundColor: '#191B22' },
           headerTitleStyle: { fontSize: 19, color: '#fff'},
           title: 'Торговый дом - Электроник',
@@ -257,6 +286,7 @@ function DileveryStack() {
         })}
       />
     </Stack.Navigator>
+    <FooterBar /></>
   );
 }
 
@@ -295,32 +325,38 @@ function CustomDrawerContent(props) {
           )}
         </View>
         <View style={drawerStyles.menuWrap}>
-          {menu.map(item => (
-            <TouchableOpacity
-              key={item.screen}
-              style={[
-                drawerStyles.menuItem,
-                props.state.routeNames[props.state.index] === item.screen && drawerStyles.menuItemActive,
-              ]}
-              onPress={() => props.navigation.navigate(item.screen)}
-              activeOpacity={0.85}
-            >
-              <Ionicons
-                name={item.icon}
-                size={22}
-                color={props.state.routeNames[props.state.index] === item.screen ? '#F9227F' : '#bbb'}
-                style={{ marginRight: 18, minWidth: 22 }}
-              />
-              <Text
-                style={[
-                  drawerStyles.menuLabel,
-                  props.state.routeNames[props.state.index] === item.screen && drawerStyles.menuLabelActive,
-                ]}
-              >
-                {item.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+   {menu.map(item => (
+  <TouchableOpacity
+    key={item.screen}
+    style={[
+      drawerStyles.menuItem,
+      props.state.routeNames[props.state.index] === item.screen && drawerStyles.menuItemActive,
+    ]}
+onPress={() => {
+  if (item.screen === 'Главная') {
+    props.navigation.navigate('Главная', { screen: 'HomeScreen' });
+  } else {
+    props.navigation.navigate(item.screen);
+  }
+}}
+    activeOpacity={0.85}
+  >
+    <Ionicons
+      name={item.icon}
+      size={22}
+      color={props.state.routeNames[props.state.index] === item.screen ? '#F9227F' : '#bbb'}
+      style={{ marginRight: 18, minWidth: 22 }}
+    />
+    <Text
+      style={[
+        drawerStyles.menuLabel,
+        props.state.routeNames[props.state.index] === item.screen && drawerStyles.menuLabelActive,
+      ]}
+    >
+      {item.label}
+    </Text>
+  </TouchableOpacity>
+))}
         </View>
       </DrawerContentScrollView>
 
@@ -345,10 +381,13 @@ function CustomDrawerContent(props) {
 
 // -------------------- MAIN NAVIGATOR --------------------
 
-export default function AppNavigator() {
+export default function AppNavigator({navigation}) {
   const { user } = useContext(MyContext);
 
   return (
+    <>
+   
+<StatusBar style="light" backgroundColor="#191B22" />
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
      screenOptions={{
@@ -365,6 +404,8 @@ export default function AppNavigator() {
       {user && <Drawer.Screen name="Профиль" component={ProfileStack} />}
        {user && <Drawer.Screen name="Хочу купить" component={FavoritesStack} />}
     </Drawer.Navigator>
+   
+    </>
   );
 }
 // -------------------- STYLES --------------------

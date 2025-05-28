@@ -178,14 +178,14 @@ const DARK_BG = '#191B22';
 const DARK_CARD = '#23262F';
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: DARK_BG, paddingHorizontal: 0 },
+  root: { flex: 1, backgroundColor: DARK_BG, paddingHorizontal: 11 },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#23262F',
     borderRadius: 15,
     margin: 12,
-    marginTop: 18,
+    marginTop: 100,
     marginBottom: 7,
     paddingLeft: 6,
     paddingVertical: 3,

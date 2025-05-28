@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, FlatList, StyleSheet, Text, Modal, TouchableOpacity, ActivityIndicator, Dimensions, ScrollView, Button } from 'react-native';
 import { api } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import RangeSlider from 'rn-range-slider';
+import { MyContext } from '../navigation/Context';
 
 const screenWidth = Dimensions.get('window').width;
 const ITEM_MARGIN = 12;
@@ -16,6 +17,17 @@ const Notch = () => <View style={styles.notch} />;
 const Label = ({ text }) => <Text style={styles.label}>{text}</Text>;
 
 export default function CatalogScreen({ route, navigation }) {
+     const {
+    user,
+    setUser,
+    logout,
+    width,
+    height,
+    isLandscape,
+    numColumns,
+    ITEM_WIDTH,
+    ITEM_MARGIN
+  } = useContext(MyContext);
   const { categoryId } = route.params || {};
   const [products, setProducts] = useState([]);
   const [loadedProducts, setLoadProducts] = useState(false);
@@ -86,7 +98,7 @@ export default function CatalogScreen({ route, navigation }) {
       <ProductCard
         product={item}
         onPress={() => navigation.navigate('ProductDetailsScreen', { product: item })}
-        style={styles.productCardCustom}
+          style={[styles.productCardCustom, { width: ITEM_WIDTH }]}
       />
     </Animated.View>
   );
@@ -103,8 +115,25 @@ export default function CatalogScreen({ route, navigation }) {
         data={products}
         keyExtractor={item => item.id.toString()}
         renderItem={renderProduct}
-        numColumns={2}
-        columnWrapperStyle={styles.row}
+
+
+
+
+        // numColumns={2}
+        // columnWrapperStyle={styles.row}
+
+ key={numColumns}
+       numColumns={numColumns}
+  columnWrapperStyle={{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: ITEM_MARGIN,
+  }}
+
+
+
+
+
         ListEmptyComponent={loadedProducts ? null : <ActivityIndicator style={{ marginTop: 50 }} size="large" color="#1E90FF" />}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
@@ -257,7 +286,7 @@ const styles = StyleSheet.create({
   },
   listContainer: { paddingHorizontal: ITEM_MARGIN, paddingBottom: 100, backgroundColor: DARK_BG, marginTop:25 },
   row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: ITEM_MARGIN },
-  productWrap: { width: ITEM_WIDTH, marginRight: ITEM_MARGIN, marginBottom: ITEM_MARGIN, backgroundColor: 'transparent' },
+  productWrap: {  marginBottom: ITEM_MARGIN, backgroundColor: 'transparent' },
   productCardCustom: { backgroundColor: DARK_CARD, borderRadius: 16, overflow: 'hidden' },
 });
 

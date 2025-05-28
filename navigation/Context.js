@@ -7,7 +7,13 @@ export const MyContext = createContext({
   logout: () => {},
 });
 
-export function AppContextProvider({ children }) {
+export function AppContextProvider({ children,
+  width,
+  height,
+  isLandscape,
+  numColumns,
+  ITEM_WIDTH,
+  ITEM_MARGIN, }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -35,7 +41,17 @@ export function AppContextProvider({ children }) {
   };
 
   return (
-    <MyContext.Provider value={{ user, setUser: login, logout }}>
+    <MyContext.Provider value={{
+      user,
+      setUser: login,
+      logout,
+      width,
+      height,
+      isLandscape,
+      numColumns,
+      ITEM_WIDTH,
+      ITEM_MARGIN,
+    }}>
       {children}
     </MyContext.Provider>
   );

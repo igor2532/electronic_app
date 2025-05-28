@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     width: '95%',
     height: 190,
     borderRadius: 16,
-    marginTop: 22,
+  
     marginBottom: 18,
     resizeMode: 'cover',
     alignSelf: 'center',
