@@ -34,3 +34,6 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+.env
+@sivgdpot__electronic_app.jks
+eas.json

@@ -12,7 +12,6 @@ export default function AuthComponent({ navigation }) {
   const [message, setMessage] = useState('');
   const { setUser } = useContext(MyContext);
 
-  // Сбросить все состояния при каждом показе экрана
   useFocusEffect(
     React.useCallback(() => {
       setEmail('');
@@ -86,7 +85,7 @@ export default function AuthComponent({ navigation }) {
             value={email}
             onChangeText={setEmail}
             editable={!loading}
-            placeholderTextColor="#bbb"
+            placeholderTextColor="#888"
           />
           <TouchableOpacity
             style={[styles.button, (!email || loading) && styles.buttonDisabled]}
@@ -107,7 +106,7 @@ export default function AuthComponent({ navigation }) {
             value={code}
             onChangeText={setCode}
             editable={!loading}
-            placeholderTextColor="#bbb"
+            placeholderTextColor="#888"
           />
           <TouchableOpacity
             style={[styles.button, (!code || loading) && styles.buttonDisabled]}
@@ -125,34 +124,47 @@ export default function AuthComponent({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'flex-start', padding: 28, backgroundColor: '#fafcff' },
-  header: { fontWeight: 'bold', fontSize: 22, marginBottom: 26, color: '#2a2d34', alignSelf: 'center' },
+  container: {
+    flex: 1, justifyContent: 'flex-start', padding: 26, backgroundColor: '#191B22'
+  },
+  header: {
+    fontWeight: 'bold', fontSize: 23, marginTop: 28, marginBottom: 28, color: '#fff', alignSelf: 'center', letterSpacing: 0.3
+  },
   input: {
-    borderColor: '#d4dae3',
-    borderWidth: 1,
-    padding: 12,
-    borderRadius: 12,
+    borderColor: '#23262F',
+    borderWidth: 1.2,
+    padding: 15,
+    borderRadius: 15,
     marginBottom: 18,
-    backgroundColor: '#fff',
-    fontSize: 16,
-    color: '#222'
+    backgroundColor: '#23262F',
+    fontSize: 17,
+    color: '#fff',
+    shadowColor: '#23262F',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.09,
+    shadowRadius: 6,
+    elevation: 1,
   },
   button: {
-    backgroundColor: 'red',
-    paddingVertical: 13,
-    borderRadius: 12,
+    backgroundColor: '#F9227F',
+    paddingVertical: 15,
+    borderRadius: 14,
     alignItems: 'center',
     marginTop: 2,
     elevation: 2,
-    marginBottom: 10
+    marginBottom: 10,
+    shadowColor: '#F9227F55',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.19,
+    shadowRadius: 10,
   },
   buttonDisabled: {
-    backgroundColor: '#cfa6a6',
+    backgroundColor: '#484758',
   },
   buttonText: {
-    color: '#fff', fontWeight: 'bold', fontSize: 16, letterSpacing: 0.7, textTransform: 'uppercase'
+    color: '#fff', fontWeight: 'bold', fontSize: 17, letterSpacing: 0.7, textTransform: 'uppercase'
   },
   message: {
-    marginTop: 18, color: '#009688', fontSize: 15, textAlign: 'center', minHeight: 25
+    marginTop: 19, color: '#6fff76', fontSize: 15, textAlign: 'center', minHeight: 25, fontWeight: 'bold'
   },
 });

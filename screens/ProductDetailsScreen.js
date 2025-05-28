@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView, Modal, Pressable, StyleSheet, Linking, ActivityIndicator, Button, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Image, ScrollView, Modal, Pressable, StyleSheet, Linking, TouchableOpacity, Alert } from 'react-native';
 import Swiper from 'react-native-swiper';
-import { GestureHandlerRootView, PinchGestureHandler } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MyContext } from '../navigation/Context';
 import { sendProductRequest } from '../utils/api';
 import { FavoritesContext } from '../navigation/FavoritesContext';
 import { Ionicons } from '@expo/vector-icons';
+
 export default function ProductDetailsScreen({ route, navigation }) {
   const { product } = route.params;
   const { user } = useContext(MyContext);
@@ -13,14 +14,14 @@ export default function ProductDetailsScreen({ route, navigation }) {
   const [activeImage, setActiveImage] = useState(null);
   const [sending, setSending] = useState(false);
   const { addFavorite, removeFavorite, isFavorite } = useContext(FavoritesContext);
-
   const fav = isFavorite(product.id);
 
   useEffect(() => {
     navigation.setOptions({
       title: product.name,
     });
-  }, [])
+  }, []);
+
   const handleSendRequest = async () => {
     setSending(true);
     try {
@@ -32,80 +33,77 @@ export default function ProductDetailsScreen({ route, navigation }) {
           permalink: product.permalink || product.url || '',
         }
       });
-      console.log('Product request response:', res);
       Alert.alert('Запрос отправлен', 'Наш менеджер свяжется с вами.');
     } catch (e) {
-      console.log('Product request error:', e);
       Alert.alert('Ошибка', 'Не удалось отправить запрос. Попробуйте позже.');
     }
     setSending(false);
   };
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ padding: 15 }}>
-        {/* ... swiper и вся остальная разметка ... */}
-        <View style={{ height: 300 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#191B22' }}>
+      <ScrollView contentContainerStyle={{ padding: 0, backgroundColor: '#191B22' }}>
+        {/* Слайдер изображений */}
+        <View style={styles.swiperWrap}>
           <Swiper
             showsPagination
-            dotStyle={{ backgroundColor: '#ccc', bottom: -10 }}
-            activeDotStyle={{ backgroundColor: 'black', bottom: -10 }}
+            dotStyle={{ backgroundColor: '#333', bottom: -10 }}
+            activeDotStyle={{ backgroundColor: '#fff', bottom: -10 }}
             paginationStyle={{ bottom: -10 }}>
             {product.images.map(img => (
               <Pressable key={img.id} onPress={() => { setActiveImage(img.src); setModalVisible(true); }}>
-                <Image source={{ uri: img.src }} style={{ height: 300, resizeMode: 'contain' }} />
+                <Image source={{ uri: img.src }} style={styles.swiperImg} resizeMode="contain" />
               </Pressable>
             ))}
           </Swiper>
+          {/* Сердечко избранного */}
           <TouchableOpacity
-  onPress={() => fav ? removeFavorite(product.id) : addFavorite(product)}
-  style={{
-    position: 'absolute',
-    top: 18,
-    right: 10,
-    zIndex: 10,
-    backgroundColor: 'rgba(255,255,255,0.90)',
-    borderRadius: 30,
-    padding: 4,
-    elevation: 4,
-  }}
-  hitSlop={8}
->
-  <Ionicons
-    name={fav ? "heart" : "heart-outline"}
-    size={36}
-    color={fav ? "#F00" : "#F00"}
-  />
-</TouchableOpacity>
-
+            onPress={() => fav ? removeFavorite(product.id) : addFavorite(product)}
+            style={styles.heartBtn}
+            hitSlop={8}
+          >
+            <Ionicons
+              name={fav ? "heart" : "heart-outline"}
+              size={38}
+              color={fav ? "#F9227F" : "#fff"}
+            />
+          </TouchableOpacity>
         </View>
-        <Text style={{ fontSize: 24, fontWeight: 'bold', marginVertical: 30 }}>{product.name}</Text>
-        <Text style={{ fontSize: 26, color: 'green', marginBottom: 15 }}>{product.price} BYN</Text>
-        <Text style={{ fontSize: 16, marginBottom: 10 }}>{product.description.replace(/<[^>]+>/g, '')}</Text>
-        <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10, color: 'black' }}>ЧТУП »ТЕХНОИВЬЕ»</Text>
-        <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10, color: '#F00' }}>Рассрочка без переплат до 6 месяцев</Text>
-        <Text style={{ fontSize: 15, fontWeight: 'bold', marginBottom: 10, color: 'black' }}>г. Ивье, ул. Красноармейская, д. 2, каб. 15</Text>
+        {/* Описание и цены */}
+        <View style={styles.content}>
+          <Text style={styles.title}>{product.name}</Text>
+          <Text style={styles.price}>{product.price} BYN</Text>
+          {!!product.description && (
+            <Text style={styles.desc}>
+              {product.description.replace(/<[^>]+>/g, '')}
+            </Text>
+          )}
+          <Text style={styles.shopTitle}>ЧТУП »ТЕХНОИВЬЕ»</Text>
+          <Text style={styles.rassrochka}>Рассрочка без переплат до 6 месяцев</Text>
+          <Text style={styles.address}>г. Ивье, ул. Красноармейская, д. 2, каб. 15</Text>
 
-        <TouchableOpacity
-          style={styles.phoneBtn}
-          onPress={() => Linking.openURL('tel:+375292898098')}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.phoneBtnText}>+375 (29) 289-80-98</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.phoneBtn}
+            onPress={() => Linking.openURL('tel:+375292898098')}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.phoneBtnText}>+375 (29) 289-80-98</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.requestBtn}
-          onPress={handleSendRequest}
-          disabled={sending}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.requestBtnText}>
-            {sending ? 'Отправка...' : 'Отправить запрос на товар'}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.requestBtn}
+            onPress={handleSendRequest}
+            disabled={sending}
+            activeOpacity={0.88}
+          >
+            <Text style={styles.requestBtnText}>
+              {sending ? 'Отправка...' : 'ОТПРАВИТЬ ЗАПРОС НА ТОВАР'}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-        {/* ... остальные блоки ... */}
-        <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Характеристики:</Text>
+        {/* Характеристики */}
+        <Text style={styles.sectionTitle}>Характеристики:</Text>
         <View style={styles.table}>
           {product.attributes.map(attr => (
             <View key={attr.id} style={styles.row}>
@@ -115,8 +113,9 @@ export default function ProductDetailsScreen({ route, navigation }) {
           ))}
         </View>
       </ScrollView>
+      {/* Увеличение картинки */}
       <Modal visible={modalVisible} transparent>
-        <Pressable style={{ flex: 1, backgroundColor: 'black' }} onPress={() => setModalVisible(false)}>
+        <Pressable style={{ flex: 1, backgroundColor: '#000' }} onPress={() => setModalVisible(false)}>
           <Image source={{ uri: activeImage }} style={{ flex: 1, resizeMode: 'contain' }} />
         </Pressable>
       </Modal>
@@ -125,57 +124,137 @@ export default function ProductDetailsScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  table: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 20,
-    elevation: 2,
+  swiperWrap: {
+    height: 310,
+    backgroundColor: '#181A20',
+    position: 'relative',
+    marginBottom: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: '#262837'
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
+  swiperImg: {
+    width: '100%',
+    height: 300,
+    alignSelf: 'center',
+    backgroundColor: '#191B22',
   },
-  cellLabel: {
+  heartBtn: {
+    position: 'absolute',
+    top: 18,
+    right: 16,
+    zIndex: 10,
+    backgroundColor: 'rgba(44,44,55,0.45)',
+    borderRadius: 30,
+    padding: 4,
+    elevation: 3,
+  },
+  content: {
+    backgroundColor: '#23262F',
+    borderBottomLeftRadius: 26,
+    borderBottomRightRadius: 26,
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 15,
+    marginBottom: 9,
+  },
+  title: {
+    fontSize: 22,
+    color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
-    flex: 1,
+    marginBottom: 11,
   },
-  cellValue: {
+  price: {
+    fontSize: 23,
+    color: '#6fff76',
+    marginBottom: 13,
+    fontWeight: 'bold',
+  },
+  desc: {
+    fontSize: 15,
+    color: '#ccc',
+    marginBottom: 11,
+  },
+  shopTitle: {
     fontSize: 16,
-    flex: 2,
+    fontWeight: 'bold',
+    color: '#B6B6B6',
+    marginBottom: 4,
+  },
+  rassrochka: {
+    fontSize: 16,
+    color: '#F9227F',
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  address: {
+    fontSize: 14,
+    color: '#aaa',
+    marginBottom: 14,
   },
   phoneBtn: {
     backgroundColor: '#F00',
-    borderRadius: 14,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
-    marginBottom: 18,
-    marginTop: 10,
+    paddingVertical: 13,
+    marginBottom: 14,
+    marginTop: 4,
     elevation: 2,
   },
   phoneBtnText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 23,
+    fontSize: 19,
     letterSpacing: 1,
   },
   requestBtn: {
     backgroundColor: '#1976D2',
-    borderRadius: 14,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    marginBottom: 22,
+    paddingVertical: 13,
+    marginBottom: 15,
     elevation: 2,
   },
   requestBtnText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 19,
+    fontSize: 17,
     letterSpacing: 1,
     textTransform: 'uppercase',
+  },
+  sectionTitle: {
+    fontSize: 17,
+    color: '#fff',
+    fontWeight: 'bold',
+    marginTop: 8,
+    marginBottom: 8,
+    marginLeft: 14,
+  },
+  table: {
+    backgroundColor: '#23262F',
+    borderRadius: 18,
+    padding: 13,
+    marginHorizontal: 10,
+    marginBottom: 25,
+    elevation: 1,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  cellLabel: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 15,
+    flex: 1.5,
+    marginRight: 8,
+  },
+  cellValue: {
+    color: '#aaa',
+    fontSize: 15,
+    flex: 2,
+    textAlign: 'right',
   },
 });

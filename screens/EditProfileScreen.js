@@ -1,17 +1,28 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, Dimensions } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, Dimensions, KeyboardAvoidingView, Platform } from 'react-native';
 import { updateUserProfile } from '../utils/api';
 import { Picker } from '@react-native-picker/picker';
+import DropDownPicker from 'react-native-dropdown-picker';
+import { MyContext } from '../navigation/Context';
+ 
 const CITIES = [
-    'Лида', 'Ивье', 'Гродно', 'Минск', 'Волковыск', 'Новогрудок', 'Слоним'
-    // ...дополни сам
+    { label: 'Лида', value: 'Лида' },
+    { label: 'Ивье', value: 'Ивье' },
+    { label: 'Гродно', value: 'Гродно' },
+    { label: 'Минск', value: 'Минск' },
+    { label: 'Волковыск', value: 'Волковыск' },
+    { label: 'Новогрудок', value: 'Новогрудок' },
+    { label: 'Слоним', value: 'Слоним' },
+    // ... добавь свои города
 ];
 
 export default function EditProfileScreen({ route, navigation }) {
+    const { setUser, user } = useContext(MyContext);
     const initProfile = route.params.profile;
     const [firstName, setFirstName] = useState(initProfile?.billing?.first_name || '');
     const [lastName, setLastName] = useState(initProfile?.billing?.last_name || '');
-    const [city, setCity] = useState(initProfile?.billing?.city || CITIES[0]);
+    const [city, setCity] = useState(initProfile?.billing?.city || CITIES[0].value);
+    const [open, setOpen] = useState(false);
     const [address, setAddress] = useState(initProfile?.billing?.address_1 || '');
     const [phone, setPhone] = useState(initProfile?.billing?.phone || '');
     const [saving, setSaving] = useState(false);
@@ -29,6 +40,19 @@ export default function EditProfileScreen({ route, navigation }) {
                 address,
                 phone
             });
+            setUser({
+                ...user,
+                billing: {
+                    ...user.billing,
+                    first_name: firstName,
+                    last_name: lastName,
+                    city,
+                    address_1: address,
+                    phone,
+                }
+            });
+
+
             setMessage('Сохранено!');
             setTimeout(() => navigation.goBack(), 700);
         } catch (e) {
@@ -37,54 +61,63 @@ export default function EditProfileScreen({ route, navigation }) {
         setSaving(false);
     };
 
-    const avatarColor = '#d70022';
+    const avatarColor = '#F9227F';
     const avatarSize = Math.floor(Dimensions.get('window').width * 0.3);
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <View style={[styles.avatarBlock, { backgroundColor: avatarColor, width: avatarSize, height: avatarSize, borderRadius: avatarSize / 6 }]}>
-                <Text style={styles.avatarText}>{firstName?.[0]?.toUpperCase() || '?'}</Text>
-            </View>
-            <View style={styles.form}>
-                <Text style={styles.label}>Имя</Text>
-                <TextInput style={styles.input} value={firstName} onChangeText={setFirstName} />
-
-                <Text style={styles.label}>Фамилия</Text>
-                <TextInput style={styles.input} value={lastName} onChangeText={setLastName} />
-
-                <Text style={styles.label}>Город</Text>
-                <View style={styles.pickerWrap}>
-                    <Picker
-                        selectedValue={city}
-                        onValueChange={setCity}
-                        style={styles.picker}
-                        itemStyle={{ fontSize: 17 }}
-                    >
-                        {CITIES.map((c) => <Picker.Item key={c} label={c} value={c} />)}
-                    </Picker>
+        <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+            <ScrollView contentContainerStyle={styles.container}>
+                <View style={[styles.avatarBlock, { backgroundColor: avatarColor, width: avatarSize, height: avatarSize, borderRadius: avatarSize / 6 }]}>
+                    <Text style={styles.avatarText}>{firstName?.[0]?.toUpperCase() || '?'}</Text>
                 </View>
+                <View style={styles.form}>
+                    <Text style={styles.label}>Имя</Text>
+                    <TextInput style={styles.input} value={firstName} onChangeText={setFirstName} placeholder="Имя" placeholderTextColor="#888" />
 
-                <Text style={styles.label}>Адрес</Text>
-                <TextInput style={styles.input} value={address} onChangeText={setAddress} />
+                    <Text style={styles.label}>Фамилия</Text>
+                    <TextInput style={styles.input} value={lastName} onChangeText={setLastName} placeholder="Фамилия" placeholderTextColor="#888" />
 
-                <Text style={styles.label}>Телефон</Text>
-                <TextInput style={styles.input} value={phone} keyboardType="phone-pad" onChangeText={setPhone} />
+                    <Text style={styles.label}>Город</Text>
+                    <DropDownPicker
+                        open={open}
+                        value={city}
+                        items={CITIES}
+                        setOpen={setOpen}
+                        setValue={setCity}
+                        placeholder="Выберите город"
+                        style={styles.dropdown}
+                        textStyle={styles.dropdownText}
+                        dropDownContainerStyle={styles.dropdownList}
+                        placeholderStyle={{ color: "#aaa" }}
+                        listItemLabelStyle={{ color: "#fff" }}
+                        theme="DARK"
+                        zIndex={1000}
+                    />
 
-                <TouchableOpacity
-                    style={styles.saveBtn}
-                    onPress={handleSave}
-                    disabled={saving}
-                >
-                    {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveBtnText}>Сохранить</Text>}
-                </TouchableOpacity>
-                {message ? <Text style={styles.message}>{message}</Text> : null}
-            </View>
-        </ScrollView>
+                    <Text style={styles.label}>Адрес</Text>
+                    <TextInput style={styles.input} value={address} onChangeText={setAddress} placeholder="Адрес" placeholderTextColor="#888" />
+
+                    <Text style={styles.label}>Телефон</Text>
+                    <TextInput style={styles.input} value={phone} keyboardType="phone-pad" onChangeText={setPhone} placeholder="Телефон" placeholderTextColor="#888" />
+
+                    <TouchableOpacity
+                        style={styles.saveBtn}
+                        onPress={handleSave}
+                        disabled={saving}
+                        activeOpacity={0.86}
+                    >
+                        {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveBtnText}>Сохранить</Text>}
+                    </TouchableOpacity>
+                    {message ? <Text style={styles.message}>{message}</Text> : null}
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { alignItems: 'center', padding: 18, backgroundColor: '#f9f9f9' },
+    root: { flex: 1, backgroundColor: '#191B22' },
+    container: { alignItems: 'center', padding: 18, backgroundColor: '#191B22', minHeight: '100%' },
     avatarBlock: {
         justifyContent: 'center',
         alignItems: 'center',
@@ -100,25 +133,42 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     form: { width: '96%', marginTop: 10 },
-    label: { color: '#aaa', fontSize: 15, marginTop: 12 },
-    input: { borderColor: '#ddd', borderWidth: 1, borderRadius: 10, padding: 12, backgroundColor: '#fff', marginTop: 3, fontSize: 17 },
-    pickerWrap: { borderColor: '#ddd', borderWidth: 1, borderRadius: 10, marginTop: 3, backgroundColor: '#fff' },
-    picker: { width: '100%', height: 44 },
-    saveBtn: { marginTop: 28, backgroundColor: '#1976D2', borderRadius: 11, paddingVertical: 13, alignItems: 'center' },
-    saveBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 17, textTransform: 'uppercase' },
-    message: { marginTop: 14, textAlign: 'center', color: '#43a047', fontSize: 16 },
+    label: { color: '#aaa', fontSize: 15, marginTop: 12, marginBottom: 1 },
+    input: {
+        borderColor: '#23262F',
+        borderWidth: 1.2,
+        borderRadius: 10,
+        padding: 13,
+        backgroundColor: '#23262F',
+        marginTop: 3,
+        fontSize: 17,
+        color: '#fff'
+    },
     pickerWrap: {
-        borderColor: '#ddd',
-        borderWidth: 1,
+        borderColor: '#23262F',
+        borderWidth: 1.2,
         borderRadius: 10,
         marginTop: 3,
-        backgroundColor: '#fff',
-        height: 55, // добавь! Можно 44-52
+        backgroundColor: '#23262F',
+        height: 55,
         justifyContent: 'center',
     },
     picker: {
         width: '100%',
-        height: 50, // добавь!
+        height: 50,
         fontSize: 17,
+        color: '#fff',
+        backgroundColor: '#23262F',
     },
+    saveBtn: {
+        marginTop: 28,
+        backgroundColor: '#F9227F', // ярко-розовая/красная кнопка
+        borderRadius: 11,
+        paddingVertical: 13,
+        alignItems: 'center'
+    },
+    saveBtnText: {
+        color: '#fff', fontWeight: 'bold', fontSize: 17, textTransform: 'uppercase', letterSpacing: 0.7
+    },
+    message: { marginTop: 14, textAlign: 'center', color: '#6fff76', fontSize: 16 },
 });
