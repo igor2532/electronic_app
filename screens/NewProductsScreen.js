@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, FlatList, ActivityIndicator, StyleSheet, Dimensions } from 'react-native';
 import { api } from '../utils/api';
 import ProductCard from '../components/ProductCard';
-
+import ProductsSkeleton from '../components/ProductsSkeleton';
 const screenWidth = Dimensions.get('window').width;
 const ITEM_MARGIN = 12;
 const ITEM_WIDTH = (screenWidth - 3 * ITEM_MARGIN) / 2;
@@ -19,7 +19,7 @@ export default function NewProductsScreen({ navigation }) {
   }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#191B22' }}>
+    <View style={{ flex: 1, backgroundColor: '#191B22',  }}>
       <FlatList
         data={products}
         keyExtractor={item => item.id.toString()}
@@ -27,13 +27,17 @@ export default function NewProductsScreen({ navigation }) {
           <ProductCard
             product={item}
             onPress={() => navigation.navigate('ProductDetailsScreen', { product: item })}
-            style={{ width: ITEM_WIDTH, backgroundColor: '#23262F', borderRadius: 16 }}
+            style={{ width: ITEM_WIDTH, backgroundColor: '#23262F', borderRadius: 16, marginTop:40 }}
           />
         )}
         numColumns={2}
         columnWrapperStyle={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: ITEM_MARGIN }}
         contentContainerStyle={{ padding: ITEM_MARGIN, paddingBottom: 100, backgroundColor: '#191B22' }}
-        ListEmptyComponent={loading ? <ActivityIndicator style={{ marginTop: 50 }} size="large" color="#1E90FF" /> : null}
+              ListEmptyComponent={loading
+          ? <ProductsSkeleton num={12} ITEM_WIDTH={ITEM_WIDTH} ITEM_MARGIN={ITEM_MARGIN} />
+          : null
+        }
+        
       />
     </View>
   );

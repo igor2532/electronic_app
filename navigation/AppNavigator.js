@@ -411,14 +411,16 @@ export default function AppNavigator({navigation}) {
 // -------------------- STYLES --------------------
 
 const styles = StyleSheet.create({
-  dileveryViewMain: { paddingBottom: 30, paddingLeft: 10, paddingRight: 10 },
+  dileveryViewMain: { paddingBottom: 30, paddingLeft: 10, paddingRight: 10,  },
   dileveryTextMain: { fontSize: 17, paddingTop: 20 },
   aboutButton: { paddingLeft: '10px' },
   aboutView: { paddingTop: 20 },
-  dileveryImage: { width: 300, height: 200, resizeMode: 'cover' },
-  dileveryText: { fontWeight: 'bold', fontSize: 18, paddingTop: 10, paddingBottom: 10, paddingLeft: 10, paddingRight: 10 },
+  dileveryImage: { width: 300, height: 200, resizeMode: 'cover',borderRadius:15 },
+  dileveryText: { fontWeight: 'bold', fontSize: 18, paddingTop: 10, paddingBottom: 10, paddingLeft: 10, paddingRight: 10,
+    color:'#fff'
+   },
   graphikText: { fontSize: 18, paddingTop: 4, paddingBottom: 4, paddingLeft: 10, paddingRight: 10 },
-  dilevery: { margin: 5, alignItems: 'center', textAlign: 'center' },
+  dilevery: {  alignItems: 'center', textAlign: 'center',backgroundColor:'#191B22',height:'100%' },
   rightTopBlock: { flexDirection: 'row', columnGap: 16, marginRight: 15 },
   drawerHeader: { alignItems: 'center', backgroundColor: '#f2f2f2', borderBottomWidth: 1, borderBottomColor: '#ddd' },
   drawerTitle: { fontSize: 18, marginBottom: 10, color: '#333' },

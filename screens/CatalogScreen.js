@@ -5,7 +5,8 @@ import ProductCard from '../components/ProductCard';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import RangeSlider from 'rn-range-slider';
 import { MyContext } from '../navigation/Context';
-
+import { Skeleton } from '@motify/skeleton';
+import ProductsSkeleton from '../components/ProductsSkeleton';
 const screenWidth = Dimensions.get('window').width;
 const ITEM_MARGIN = 12;
 const ITEM_WIDTH = (screenWidth - 3 * ITEM_MARGIN) / 2;
@@ -28,7 +29,7 @@ export default function CatalogScreen({ route, navigation }) {
     ITEM_WIDTH,
     ITEM_MARGIN
   } = useContext(MyContext);
-  const { categoryId } = route.params || {};
+  const { categoryId,categoryTitle } = route.params || {};
   const [products, setProducts] = useState([]);
   const [loadedProducts, setLoadProducts] = useState(false);
   const [page, setPage] = useState(1);
@@ -39,7 +40,10 @@ export default function CatalogScreen({ route, navigation }) {
   const [attributes, setAttributes] = useState([]);
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [filterVisible, setFilterVisible] = useState(false);
-  const [categoryTitle, setCategoryTitle] = useState('Каталог');
+  // const [categoryTitle, setCategoryTitle] = useState('Каталог');
+
+
+
 
   const loadProducts = (reset = false) => {
     const attributeQuery = Object.entries(selectedAttributes).flatMap(([key, values]) =>
@@ -76,11 +80,11 @@ export default function CatalogScreen({ route, navigation }) {
 
       // Название выбранной категории для шапки
       if (categoryId) {
-        const selectedCat = filteredCats.find(cat => cat.id === categoryId);
-        setCategoryTitle(selectedCat ? selectedCat.name : 'Каталог');
+        const selectedCat = filteredCats.find(cat => String(cat.id) === String(categoryId));
+        // setCategoryTitle(selectedCat ? selectedCat.name : 'Каталог');
         navigation.setOptions({ title: selectedCat ? selectedCat.name : 'Каталог' });
       } else {
-        setCategoryTitle('Каталог');
+        // setCategoryTitle('Каталог');
         navigation.setOptions({ title: 'Каталог' });
       }
     });
@@ -105,18 +109,17 @@ export default function CatalogScreen({ route, navigation }) {
 
   return (
     <View style={styles.root}>
-      {/* Если нужны фильтры — можно вернуть кнопку ниже */}
-      {/* 
-      <TouchableOpacity style={styles.filterBtn} onPress={() => setFilterVisible(true)}>
-        <Text style={styles.filterText}>Фильтры</Text>
-      </TouchableOpacity>
-      */}
+ 
       <FlatList
         data={products}
         keyExtractor={item => item.id.toString()}
         renderItem={renderProduct}
 
-
+ ListHeaderComponent={() => (
+        <View style={{ padding: 20, }}>
+           <Text style={{ fontSize: 22, color:'#fff', textAlign:'center', fontWeight:'bold' }}>{categoryTitle}</Text>
+        </View>
+      )}
 
 
         // numColumns={2}
@@ -134,7 +137,11 @@ export default function CatalogScreen({ route, navigation }) {
 
 
 
-        ListEmptyComponent={loadedProducts ? null : <ActivityIndicator style={{ marginTop: 50 }} size="large" color="#1E90FF" />}
+      ListEmptyComponent={loadedProducts
+  ? null
+  : <ProductsSkeleton num={12} ITEM_WIDTH={ITEM_WIDTH} ITEM_MARGIN={ITEM_MARGIN} />
+}
+
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
       />
@@ -284,7 +291,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#fff'
   },
-  listContainer: { paddingHorizontal: ITEM_MARGIN, paddingBottom: 100, backgroundColor: DARK_BG, marginTop:25 },
+  listContainer: { paddingHorizontal: ITEM_MARGIN, paddingBottom: 100, backgroundColor: DARK_BG, marginTop:46 },
   row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: ITEM_MARGIN },
   productWrap: {  marginBottom: ITEM_MARGIN, backgroundColor: 'transparent' },
   productCardCustom: { backgroundColor: DARK_CARD, borderRadius: 16, overflow: 'hidden' },

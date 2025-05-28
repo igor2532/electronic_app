@@ -42,7 +42,7 @@ export default function ProductDetailsScreen({ route, navigation }) {
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#191B22' }}>
-      <ScrollView contentContainerStyle={{ padding: 0, backgroundColor: '#191B22' }}>
+      <ScrollView contentContainerStyle={{ padding: 0, backgroundColor: '#191B22' ,paddingBottom:50}}>
         {/* Слайдер изображений */}
         <View style={styles.swiperWrap}>
           <Swiper
@@ -130,7 +130,8 @@ const styles = StyleSheet.create({
     position: 'relative',
     marginBottom: 0,
     borderBottomWidth: 1,
-    borderBottomColor: '#262837'
+    borderBottomColor: '#262837',
+    marginTop:50
   },
   swiperImg: {
     width: '100%',

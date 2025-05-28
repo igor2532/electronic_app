@@ -35,6 +35,7 @@ export default function FavoritesScreen({ navigation }) {
   return (
     <View style={{ flex: 1, backgroundColor: '#191B22' }}>
       <FlatList
+      
         data={favorites}
         keyExtractor={item => item.id.toString()}
         numColumns={2}
@@ -50,7 +51,7 @@ export default function FavoritesScreen({ navigation }) {
 const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#191B22' },
   empty: { color: '#888', fontSize: 19, marginTop: 80 },
-  listContainer: { padding: ITEM_MARGIN, paddingBottom: 80, backgroundColor: '#191B22' ,marginTop:20},
+  listContainer: { padding: ITEM_MARGIN, paddingBottom: 80, backgroundColor: '#191B22' ,marginTop:50},
   row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: ITEM_MARGIN },
   card: {
     width: ITEM_WIDTH,
