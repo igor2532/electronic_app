@@ -40,7 +40,7 @@ export default function ProfileScreen({ navigation }) {
   ];
 
   return (
-    <ScrollView style={styles.scrollRoot} contentContainerStyle={{ alignItems: 'center', paddingBottom: 50 }}>
+    <ScrollView style={styles.scrollRoot} contentContainerStyle={{ alignItems: 'center', paddingBottom: 80, paddingTop:30 }}>
       <View style={[styles.avatarBlock, { backgroundColor: avatarColor, width: avatarSize, height: avatarSize, borderRadius: avatarSize / 6 }]}>
         <Text style={styles.avatarText}>{initial}</Text>
       </View>
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 15,
     marginTop: 20,
-    elevation: 2
+    elevation: 2,
   },
   editBtnText: {
     color: '#fff', fontWeight: 'bold', fontSize: 16.5, marginLeft: 8, textTransform: 'uppercase', letterSpacing: 0.7

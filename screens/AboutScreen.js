@@ -1,135 +1,248 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Linking } from 'react-native';
+import React, { useEffect } from 'react';
+import {
+  View,
+  Text,
+  ImageBackground,
+  StyleSheet,
+  ScrollView,
+  Linking,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
+import * as Animatable from 'react-native-animatable';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Animated, Easing } from 'react-native';
+const { width } = Dimensions.get('window');
+const HEIGHT = 250;
+function ShinyButton({ text, onPress, colors = ['#FF00CC', '#3333FF'] }) {
+  const animation = React.useRef(new Animated.Value(0)).current;
+
+  React.useEffect(() => {
+    Animated.loop(
+      Animated.timing(animation, {
+        toValue: 1,
+        duration: 2800,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, []);
+
+  const translateX = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-200, 200],
+  });
+
+  return (
+    <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={{ marginBottom: 16 }}>
+      <View style={styles.shinyWrapper}>
+        <LinearGradient
+          colors={colors}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          style={styles.gradientBase}
+        />
+        <Animated.View
+          style={[
+            styles.gradientShine,
+            {
+              transform: [{ translateX }],
+            },
+          ]}
+        >
+          <LinearGradient
+            colors={['rgba(255,255,255,0.3)', 'rgba(255,255,255,0)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.shineLayer}
+          />
+        </Animated.View>
+        <Text style={styles.phoneText}>{text}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
 
 export default function AboutScreen({ navigation }) {
-  React.useEffect(() => {
-    navigation.setOptions({ title: 'Контакты' });
+  useEffect(() => {
+    navigation.setOptions({ title: 'О нас / Контакты' });
   }, []);
 
   return (
-    <ScrollView style={styles.root} contentContainerStyle={{ alignItems: 'center', paddingBottom: 32 }}>
-      <Image style={styles.img} source={require('../assets/td.jpg')} />
-      <Text style={styles.desc}>
-        Розничная торговля бытовой техникой и электроникой, электроинструментом, мотоблоками, мотоциклами и др.
-      </Text>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Режим работы:</Text>
-        {[
-          'Понедельник: 10:00–18:00',
-          'Вторник: 10:00–18:00',
-          'Среда: 10:00–18:00',
-          'Четверг: 10:00–18:00',
-          'Пятница: 10:00–18:00',
-          'Суббота: 10:00–18:00',
-          'Воскресенье: 10:00–18:00',
-        ].map((d) => (
-          <Text style={styles.time} key={d}>{d}</Text>
-        ))}
+    <ScrollView style={styles.root} contentContainerStyle={{ paddingBottom: 80 }}>
+      {/* 🔝 Фоновое изображение */}
+      <View style={styles.topBlock}>
+        <ImageBackground
+          source={require('../assets/td.jpg')}
+          style={styles.bgImage}
+          imageStyle={{ borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}
+        >
+          <View style={styles.overlay}>
+            <Text style={styles.title}>Добро пожаловать в ТД «Электроник»</Text>
+            <Text style={styles.sub}>Техника и уют для каждого дома 💡</Text>
+          </View>
+        </ImageBackground>
       </View>
 
-      <TouchableOpacity
-        style={styles.phoneBtn}
-        onPress={() => Linking.openURL('tel:+375292898098')}
-        activeOpacity={0.87}
-      >
-        <Text style={styles.phoneBtnText}>+375 (29) 289-80-98</Text>
-      </TouchableOpacity>
-
-      <View style={styles.infoBlock}>
-        <Text style={styles.orgTitle}>ЧТУП "ТЕХНОИВЬЕ"</Text>
-        <Text style={styles.infoText}>
-          г. Ивье, ул. Красноармейская, д. 2, каб. 15{'\n'}
-          УНП 590191596,{'\n'}
-          Регистрационный номер в торговом реестре РБ 333340.{'\n'}
-          Сведения внесены 11.10.017 г.
+      <Animatable.View animation="fadeInUp" delay={200} style={styles.block}>
+        <Text style={styles.paragraph}>
+          Уже более 10 лет мы предлагаем широкий выбор бытовой техники, электроники, садовой техники и строительных
+          инструментов. Вдохновляем на комфорт, автоматизируем быт и подбираем решение под ваш бюджет.
         </Text>
-      </View>
+      </Animatable.View>
+
+      <Animatable.View animation="fadeInUp" delay={400} style={styles.block}>
+        <Text style={styles.blockTitle}>🔧 Почему выбирают нас:</Text>
+        <Text style={styles.item}>📦 Более 5000 товаров в наличии</Text>
+        <Text style={styles.item}>🚚 Доставка по всей Беларуси</Text>
+        <Text style={styles.item}>🛠 Официальная гарантия и поддержка</Text>
+        <Text style={styles.item}>💳 Рассрочка до 6 месяцев без переплат</Text>
+        <Text style={styles.item}>🧠 Консультации от опытных специалистов</Text>
+      </Animatable.View>
+
+      <Animatable.View animation="fadeInUp" delay={600} style={styles.block}>
+        <Text style={styles.blockTitle}>🕒 Режим работы</Text>
+        <Text style={styles.item}>ПН–ПТ: 10:00–18:00</Text>
+        <Text style={styles.item}>СБ–ВС: 10:00–15:00</Text>
+      </Animatable.View>
+<Animatable.View animation="fadeInUp" delay={800} style={styles.callBlock}>
+  <ShinyButton
+    text="📞 +375 (29) 289-80-98"
+    onPress={() => Linking.openURL('tel:+375292898098')}
+    colors={['#FF00CC', '#3333FF']}
+  />
+  <ShinyButton
+    text="📞 +375 (29) 651-90-78"
+    onPress={() => Linking.openURL('tel:+375296519078')}
+    colors={['#FF5F6D', '#FFC371']}
+  />
+  <ShinyButton
+    text="📞 +375 (15) 956-00-96"
+    onPress={() => Linking.openURL('tel:+375159560096')}
+    colors={['#1E90FF', '#00BFFF']}
+  />
+  <Text style={styles.small}>Звоните, с радостью проконсультируем!</Text>
+</Animatable.View>
+
+
+      <Animatable.View animation="fadeInUp" delay={1000} style={styles.block}>
+        <Text style={styles.blockTitle}>🏢 Реквизиты</Text>
+        <Text style={styles.item}>ЧТУП «ТЕХНОИВЬЕ»</Text>
+        <Text style={styles.item}>г. Ивье, ул. Красноармейская, д. 2, каб. 15</Text>
+        <Text style={styles.item}>УНП 590191596</Text>
+        <Text style={styles.item}>Торговый реестр №333340 от 11.10.2017</Text>
+      </Animatable.View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#191B22' },
-  img: {
-    width: '95%',
-    height: 190,
-    borderRadius: 16,
-  
-    marginBottom: 18,
-    resizeMode: 'cover',
-    alignSelf: 'center',
-    backgroundColor: '#23262F',
+  root: {
+    flex: 1,
+    backgroundColor: '#191B22',
   },
-  desc: {
+  topBlock: {
+    width: '100%',
+    height: HEIGHT,
+    marginBottom: 20,
+  },
+  bgImage: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  overlay: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+  },
+  title: {
     color: '#fff',
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 18,
-    marginHorizontal: 10,
-    fontWeight: '400',
-  },
-  card: {
-    width: '92%',
-    backgroundColor: '#23262F',
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 18,
-    elevation: 2,
-    alignItems: 'center',
-  },
-  cardTitle: {
-    color: '#fff',
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 8,
-    letterSpacing: 0.5,
+    lineHeight: 30,
   },
-  time: {
+  sub: {
+    color: '#ddd',
+    fontSize: 15,
+    marginTop: 6,
+  },
+  block: {
+    backgroundColor: '#23262F',
+    marginHorizontal: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    marginBottom: 22,
+  },
+  blockTitle: {
     color: '#fff',
+    fontSize: 17,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  item: {
+    color: '#ccc',
     fontSize: 15.5,
-    marginBottom: 2,
-    letterSpacing: 0.2,
+    marginBottom: 6,
+  },
+  paragraph: {
+    color: '#bbb',
+    fontSize: 15.5,
+    lineHeight: 22,
+  },
+  callBlock: {
+    alignItems: 'center',
+    marginBottom: 28,
+    marginTop: -8,
   },
   phoneBtn: {
     backgroundColor: '#F9227F',
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 45,
-    marginBottom: 16,
-    elevation: 3,
-    width: '92%',
-    alignSelf: 'center',
-  },
-  phoneBtnText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 19,
-    letterSpacing: 0.8,
+    fontSize: 18,
+    paddingVertical: 12,
+    paddingHorizontal: 36,
+    borderRadius: 20,
+    overflow: 'hidden',
   },
-  infoBlock: {
-    width: '92%',
-    backgroundColor: '#23262F',
-    borderRadius: 16,
-    padding: 17,
-    marginBottom: 24,
-    alignItems: 'center',
-    elevation: 1,
+  small: {
+    color: '#bbb',
+    fontSize: 13,
+    marginTop: 8,
   },
-  orgTitle: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16.5,
-    marginBottom: 7,
-    textAlign: 'center',
-  },
-  infoText: {
-    color: '#b0b0b0',
-    fontSize: 14.5,
-    textAlign: 'center',
-    letterSpacing: 0.05,
-    fontWeight: '400',
-  },
+  shinyWrapper: {
+  width: '92%',
+  borderRadius: 24,
+  overflow: 'hidden',
+  position: 'relative',
+  justifyContent: 'center',
+  alignItems: 'center',
+  paddingVertical: 16,
+  marginHorizontal: 'auto', paddingLeft:30,paddingRight:30
+},
+gradientBase: {
+  ...StyleSheet.absoluteFillObject,
+},
+gradientShine: {
+  position: 'absolute',
+  left: 0,
+  top: 0,
+  bottom: 0,
+  width: '100%',
+  opacity: 0.6,
+ 
+},
+shineLayer: {
+  width: '100%',
+  height: '100%',
+  
+},
+phoneText: {
+  color: '#fff',
+  fontSize: 18,
+  fontWeight: 'bold',
+  zIndex: 2,
+},
 });

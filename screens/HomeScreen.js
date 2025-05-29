@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, FlatList, StyleSheet, ActivityIndicator, Text, TouchableOpacity, Image, Dimensions, useWindowDimensions } from 'react-native';
-import { api } from '../utils/api';
+import { api, getNews } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { MyContext } from '../navigation/Context';
 import Swiper from 'react-native-swiper';
 import FooterBar from './FooterBar';
 import { Skeleton } from 'moti/skeleton';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const screenWidth = Dimensions.get('window').width;
 const ITEM_MARGIN = 12;
@@ -17,7 +18,14 @@ export default function HomeScreen({ navigation }) {
     ITEM_WIDTH,
     ITEM_MARGIN
   } = useContext(MyContext);
-
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+useEffect(() => {
+  getNews().then(data => {
+    setNews(data);
+    setLoading(false);
+  });
+}, []);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
@@ -45,44 +53,44 @@ export default function HomeScreen({ navigation }) {
       </View>
     );
   }
-function ProductsSkeleton({ num = 8, ITEM_WIDTH = 160, ITEM_MARGIN = 12 }) {
-  // num — количество skeleton-карточек, делай чётное для красивого выравнивания
-  const rows = Math.ceil(num / 2);
-  let idx = 0;
-  return (
-    <View>
-      {Array(rows).fill().map((_, rowIdx) => (
-        <View
-          key={rowIdx}
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginBottom: ITEM_MARGIN,
-            paddingHorizontal: ITEM_MARGIN,
-          }}>
-          {[0, 1].map(col => {
-            idx++;
-            if (idx > num) return <View key={col} style={{ width: ITEM_WIDTH }} />;
-            return (
-              <View
-                key={col}
-                style={{
-                  width: ITEM_WIDTH,
-                  borderRadius: 16,
-                  backgroundColor: 'transparent',
-                  overflow: 'hidden',
-                }}>
-                <Skeleton show width={ITEM_WIDTH} height={120} radius={14} color="#dadbe3" />
-                <Skeleton show width={ITEM_WIDTH * 0.8} height={15} radius={5} color="#dadbe3" style={{ marginTop: 8, marginBottom: 4 }} />
-                <Skeleton show width={ITEM_WIDTH * 0.6} height={15} radius={5} color="#dadbe3" />
-              </View>
-            );
-          })}
-        </View>
-      ))}
-    </View>
-  );
-}
+  function ProductsSkeleton({ num = 8, ITEM_WIDTH = 160, ITEM_MARGIN = 12 }) {
+    // num — количество skeleton-карточек, делай чётное для красивого выравнивания
+    const rows = Math.ceil(num / 2);
+    let idx = 0;
+    return (
+      <View>
+        {Array(rows).fill().map((_, rowIdx) => (
+          <View
+            key={rowIdx}
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginBottom: ITEM_MARGIN,
+              paddingHorizontal: ITEM_MARGIN,
+            }}>
+            {[0, 1].map(col => {
+              idx++;
+              if (idx > num) return <View key={col} style={{ width: ITEM_WIDTH }} />;
+              return (
+                <View
+                  key={col}
+                  style={{
+                    width: ITEM_WIDTH,
+                    borderRadius: 16,
+                    backgroundColor: 'transparent',
+                    overflow: 'hidden',
+                  }}>
+                  <Skeleton show width={ITEM_WIDTH} height={120} radius={14} color="#dadbe3" />
+                  <Skeleton show width={ITEM_WIDTH * 0.8} height={15} radius={5} color="#dadbe3" style={{ marginTop: 8, marginBottom: 4 }} />
+                  <Skeleton show width={ITEM_WIDTH * 0.6} height={15} radius={5} color="#dadbe3" />
+                </View>
+              );
+            })}
+          </View>
+        ))}
+      </View>
+    );
+  }
 
 
   function SliderSkeleton() {
@@ -151,6 +159,27 @@ function ProductsSkeleton({ num = 8, ITEM_WIDTH = 160, ITEM_MARGIN = 12 }) {
             />
           )}
       </View>
+      {/*Записи*/}
+  <View style={{ paddingHorizontal: 16 }}>
+  <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold', marginVertical: 10 }}>Новости/Акции</Text>
+  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+    {loading && <ProductsSkeleton num={1 * 2} numColumns={numColumns} ITEM_WIDTH={ITEM_WIDTH} ITEM_MARGIN={ITEM_MARGIN} />}
+    {news.slice(0, 4).map(item => (
+      <TouchableOpacity
+        key={item.id}
+        onPress={() => navigation.navigate('SingleScreen', { post: item })}
+        style={{ width: 140, height: 140, marginRight: 12, backgroundColor: '#2a2b32', borderRadius: 12, overflow: 'hidden' }}
+      >
+        {item._embedded?.['wp:featuredmedia']?.[0]?.source_url && (
+          <Image
+            source={{ uri: item._embedded['wp:featuredmedia'][0].source_url }}
+            style={{ width: '100%', height: '100%' }}
+          />
+        )}
+      </TouchableOpacity>
+    ))}
+  </ScrollView>
+</View>
       {/* --- Новые поступления --- */}
       <View style={styles.newBlock}>
         <Text style={styles.newProductsTitle}>Новые поступления</Text>
@@ -228,9 +257,9 @@ const styles = StyleSheet.create({
   carouselItem: { width: 72, alignItems: 'center', marginRight: 20 },
   carouselImage: { width: 36, height: 36, borderRadius: 12, backgroundColor: '#222' },
   carouselText: { fontSize: 12, color: '#fff', textAlign: 'center', marginTop: 2 },
-  newBlock: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 10, marginTop:10, marginBottom: 17 },
+  newBlock: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 10, marginTop: 10, marginBottom: 17 },
   newProductsTitle: { fontWeight: 'bold', fontSize: 18, color: '#fff', letterSpacing: 0.3 },
-  moreBtn: { color: '#fff', fontWeight: 'bold', fontSize: 15, marginLeft: 10, backgroundColor:'#dc1321', paddingLeft:10,paddingRight:10,paddingTop:2,paddingBottom:2, borderRadius:5 },
+  moreBtn: { color: '#fff', fontWeight: 'bold', fontSize: 15, marginLeft: 10, backgroundColor: '#dc1321', paddingLeft: 10, paddingRight: 10, paddingTop: 2, paddingBottom: 2, borderRadius: 5 },
   listContainer: { paddingHorizontal: ITEM_MARGIN, paddingBottom: 100, backgroundColor: DARK_BG },
   row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: ITEM_MARGIN },
   productWrap: { width: ITEM_WIDTH, marginRight: ITEM_MARGIN, marginBottom: ITEM_MARGIN, backgroundColor: 'transparent' },

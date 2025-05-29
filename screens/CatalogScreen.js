@@ -337,7 +337,35 @@ onPress={() => {
         <ActivityIndicator style={{ display: loadedProducts ? 'none' : 'flex' }} size="large" color="#1E90FF" />
       )}
       {loadedProducts && products.length >= 20 && (
-        <Button color="#1E90FF" title="Загрузить еще" onPress={() => { setLoadProducts(false); loadProducts(); }} />
+        <TouchableOpacity
+  onPress={() => {
+    setLoadProducts(false);
+    loadProducts();
+  }}
+  style={{
+    position: 'absolute',
+    bottom: 80,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 999,
+  }}
+>
+  <View
+    style={{
+      backgroundColor: 'rgba(199, 19, 19, 0.28)',
+      padding: 14,
+      borderRadius: 30,
+      elevation: 4,
+      shadowColor: '#000',
+      shadowOpacity: 0.2,
+      shadowOffset: { width: 0, height: 2 },
+    }}
+  >
+    <Ionicons name="reload" size={24} color="#fff" />
+  </View>
+</TouchableOpacity>
       )}
 
 

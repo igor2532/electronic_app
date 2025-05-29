@@ -5,7 +5,8 @@ import { MyContext } from '../navigation/Context';
 import { WP_SITE_URL } from '@env';
 
 export default function AuthComponent({ navigation }) {
-  const [email, setEmail] = useState('');
+  const [method, setMethod] = useState('email'); // 'email' | 'sms'
+  const [value, setValue] = useState('');
   const [code, setCode] = useState('');
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -14,7 +15,7 @@ export default function AuthComponent({ navigation }) {
 
   useFocusEffect(
     React.useCallback(() => {
-      setEmail('');
+      setValue('');
       setCode('');
       setStep(1);
       setLoading(false);
@@ -22,13 +23,13 @@ export default function AuthComponent({ navigation }) {
     }, [])
   );
 
-  const handleSendCode = async () => {
+  const sendCode = async () => {
     setLoading(true);
     setMessage('');
     try {
       const form = new FormData();
-      form.append('action', 'app_send_code');
-      form.append('email', email);
+      form.append('action', method === 'email' ? 'app_send_code' : 'app_send_sms');
+      form.append(method, value);
       const res = await fetch(`${WP_SITE_URL}/wp-admin/admin-ajax.php`, {
         method: 'POST',
         body: form,
@@ -36,7 +37,7 @@ export default function AuthComponent({ navigation }) {
       const data = await res.json();
       if (data.success) {
         setStep(2);
-        setMessage('Код отправлен на email');
+        setMessage(`Код отправлен на ${method === 'email' ? 'email' : 'телефон'}`);
       } else {
         setMessage(data.data || 'Ошибка отправки');
       }
@@ -46,13 +47,13 @@ export default function AuthComponent({ navigation }) {
     setLoading(false);
   };
 
-  const handleCheckCode = async () => {
+  const checkCode = async () => {
     setLoading(true);
     setMessage('');
     try {
       const form = new FormData();
-      form.append('action', 'app_check_code');
-      form.append('email', email);
+      form.append('action', method === 'email' ? 'app_check_code' : 'app_check_sms');
+      form.append(method, value);
       form.append('code', code);
       const res = await fetch(`${WP_SITE_URL}/wp-admin/admin-ajax.php`, {
         method: 'POST',
@@ -74,34 +75,48 @@ export default function AuthComponent({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Авторизация по email</Text>
+      <Text style={styles.header}>Авторизация</Text>
+
+      <View style={styles.switch}>
+        <TouchableOpacity
+          onPress={() => setMethod('email')}
+          style={[styles.switchBtn, method === 'email' && styles.switchActive]}>
+          <Text style={styles.switchText}>Email</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setMethod('sms')}
+          style={[styles.switchBtn, method === 'sms' && styles.switchActive]}>
+          <Text style={styles.switchText}>СМС</Text>
+        </TouchableOpacity>
+      </View>
+
       {step === 1 && (
         <>
           <TextInput
             style={styles.input}
-            placeholder="Email"
-            autoCapitalize="none"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
+            placeholder={method === 'email' ? 'Email' : 'Телефон (+375...)'}
+            keyboardType={method === 'email' ? 'email-address' : 'phone-pad'}
+            value={value}
+            onChangeText={setValue}
             editable={!loading}
             placeholderTextColor="#888"
           />
           <TouchableOpacity
-            style={[styles.button, (!email || loading) && styles.buttonDisabled]}
-            onPress={handleSendCode}
-            disabled={!email || loading}
+            style={[styles.button, (!value || loading) && styles.buttonDisabled]}
+            onPress={sendCode}
+            disabled={!value || loading}
             activeOpacity={0.8}
           >
             {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Получить код</Text>}
           </TouchableOpacity>
         </>
       )}
+
       {step === 2 && (
         <>
           <TextInput
             style={styles.input}
-            placeholder="Введите код из email"
+            placeholder="Код подтверждения"
             keyboardType="number-pad"
             value={code}
             onChangeText={setCode}
@@ -110,7 +125,7 @@ export default function AuthComponent({ navigation }) {
           />
           <TouchableOpacity
             style={[styles.button, (!code || loading) && styles.buttonDisabled]}
-            onPress={handleCheckCode}
+            onPress={checkCode}
             disabled={!code || loading}
             activeOpacity={0.8}
           >
@@ -118,6 +133,7 @@ export default function AuthComponent({ navigation }) {
           </TouchableOpacity>
         </>
       )}
+
       {!!message && <Text style={styles.message}>{message}</Text>}
     </View>
   );
@@ -128,7 +144,7 @@ const styles = StyleSheet.create({
     flex: 1, justifyContent: 'flex-start', padding: 26, backgroundColor: '#191B22'
   },
   header: {
-    fontWeight: 'bold', fontSize: 23, marginTop: 28, marginBottom: 28, color: '#fff', alignSelf: 'center', letterSpacing: 0.3
+    fontWeight: 'bold', fontSize: 23, marginTop: 28, marginBottom: 28, color: '#fff', alignSelf: 'center'
   },
   input: {
     borderColor: '#23262F',
@@ -139,32 +155,41 @@ const styles = StyleSheet.create({
     backgroundColor: '#23262F',
     fontSize: 17,
     color: '#fff',
-    shadowColor: '#23262F',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.09,
-    shadowRadius: 6,
-    elevation: 1,
   },
   button: {
     backgroundColor: '#F9227F',
     paddingVertical: 15,
     borderRadius: 14,
     alignItems: 'center',
-    marginTop: 2,
-    elevation: 2,
     marginBottom: 10,
-    shadowColor: '#F9227F55',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.19,
-    shadowRadius: 10,
   },
   buttonDisabled: {
     backgroundColor: '#484758',
   },
   buttonText: {
-    color: '#fff', fontWeight: 'bold', fontSize: 17, letterSpacing: 0.7, textTransform: 'uppercase'
+    color: '#fff', fontWeight: 'bold', fontSize: 17
   },
   message: {
-    marginTop: 19, color: '#6fff76', fontSize: 15, textAlign: 'center', minHeight: 25, fontWeight: 'bold'
+    marginTop: 19, color: '#6fff76', fontSize: 15, textAlign: 'center'
   },
+  switch: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 20,
+    gap: 10,
+  },
+  switchBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#2a2b32',
+  },
+  switchActive: {
+    backgroundColor: '#1E90FF',
+  },
+  switchText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: 'bold',
+  }
 });

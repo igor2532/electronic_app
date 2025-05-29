@@ -54,10 +54,10 @@ export const redeemBonus = async (user_id) => {
 };
 
 // ========== Получить новости/акции ==========
-export const getNews = async () => {
-  const res = await fetch(`${WP_SITE_URL}/wp-json/wp/v2/posts?categories=скидка`);
-  return await res.json();
-};
+// export const getNews = async () => {
+//   const res = await fetch(`${WP_SITE_URL}/wp-json/wp/v2/posts?categories=скидка`);
+//   return await res.json();
+// };
 
 // ========== Поиск ==========
 export const search = async (q) => {
@@ -118,4 +118,33 @@ export const sendProductRequest = async ({ user, products }) => {
   const data = await res.json();
   if (!data.success) throw new Error(data.data || 'Ошибка отправки заявки');
   return data;
+};
+
+
+//send sms auth
+
+
+export const sendSmsCode = async (phone) => {
+  const res = await fetch(`${WP_SITE_URL}/wp-json/myplugin/v1/send-code/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone }),
+  });
+  return await res.json();
+};
+
+export const verifySmsCode = async (phone, code) => {
+  const res = await fetch(`${WP_SITE_URL}/wp-json/myplugin/v1/verify-code/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone, code }),
+  });
+  return await res.json();
+};
+
+
+//новости
+export const getNews = async () => {
+  const res = await fetch(`${WP_SITE_URL}/wp-json/wp/v2/posts?categories=2977&_embed&per_page=20`);
+  return await res.json();
 };

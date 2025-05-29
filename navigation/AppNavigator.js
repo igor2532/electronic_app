@@ -16,6 +16,8 @@ import FooterBar from '../screens/FooterBar';
 import { StatusBar } from 'expo-status-bar';
 import RequestScreen from '../screens/RequestScreen';
 import NewProductsScreen from '../screens/NewProductsScreen';
+import BlogScreen from '../screens/BlogScreen';
+import SingleScreen from '../screens/SingleScreen';
 import { TouchableOpacity, View, Text, StyleSheet, Linking, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { MyContext } from '../navigation/Context';
@@ -294,6 +296,16 @@ function MainStack() {
     headerLeft: () => <IconsMenu navigation={navigation} />,
   })}
 />
+<Stack.Screen
+  name="BlogScreen"
+  component={BlogScreen}
+  options={{ headerShown: false }}
+/>
+<Stack.Screen
+  name="SingleScreen"
+  component={SingleScreen}
+  options={{ headerShown: false }}
+/>
       {/* Здесь больше нет дублирующего "Авторизация" */}
     </Stack.Navigator>
     <FooterBar /></>
@@ -332,6 +344,7 @@ function CustomDrawerContent(props) {
   const menu = [
     { label: 'Главная', icon: 'home-outline', screen: 'Главная' },
     { label: 'Каталог', icon: 'grid-outline', screen: 'CategoriesScreen' },
+    { label: 'Новости / Акции', icon: 'newspaper-outline', screen: 'BlogScreen' },
     { label: 'Доставка', icon: 'car-outline', screen: 'Доставка' },
     { label: 'О нас/Контакты', icon: 'information-circle-outline', screen: 'О нас/Контакты' },
     !user && { label: 'Авторизация', icon: 'log-in-outline', screen: 'Авторизация' },
