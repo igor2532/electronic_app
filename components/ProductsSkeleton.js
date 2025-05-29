@@ -1,4 +1,4 @@
-import { Skeleton } from "@motify/skeleton";
+import { Skeleton } from "moti/skeleton";
 import { View } from "react-native";
 
 

@@ -6,7 +6,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { MyContext } from '../navigation/Context';
 import Swiper from 'react-native-swiper';
 import FooterBar from './FooterBar';
-import { Skeleton } from '@motify/skeleton';
+import { Skeleton } from 'moti/skeleton';
 
 const screenWidth = Dimensions.get('window').width;
 const ITEM_MARGIN = 12;
@@ -25,7 +25,7 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     setLoadingProducts(true);
     api.get('/products/categories?per_page=100')
-      .then(res => setCategories(res.data.filter(cat => cat.count > 0)))
+      .then(res => setCategories(res.data.filter(cat => cat.count > 0 && cat.parent === 0)))
       .catch(console.error);
     api.get('/products?orderby=date&order=desc&per_page=20')
       .then(res => { setProducts(res.data); setLoadingProducts(false); })

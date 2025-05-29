@@ -16,6 +16,37 @@ export function AppContextProvider({ children,
   ITEM_MARGIN, }) {
   const [user, setUser] = useState(null);
 
+//29052025
+const [requestItems, setRequestItems] = useState([]);
+
+useEffect(() => {
+  (async () => {
+    const stored = await AsyncStorage.getItem('requestItems');
+    if (stored) {
+      try {
+        setRequestItems(JSON.parse(stored));
+      } catch (e) {
+        setRequestItems([]);
+      }
+    }
+  })();
+}, []);
+
+const addToRequest = (product) => {
+  setRequestItems(prev => {
+    const found = prev.find(p => p.id === product.id);
+    if (found) {
+      return prev.map(p => p.id === product.id ? { ...p, qty: (p.qty || 1) + 1 } : p);
+    }
+    return [...prev, { ...product, qty: 1 }];
+  });
+};
+
+const removeFromRequest = (id) => {
+  setRequestItems((prev) => prev.filter(p => p.id !== id));
+};
+//29052025
+  
   useEffect(() => {
     (async () => {
       try {
@@ -51,6 +82,11 @@ export function AppContextProvider({ children,
       numColumns,
       ITEM_WIDTH,
       ITEM_MARGIN,
+requestItems,
+setRequestItems,
+addToRequest,
+removeFromRequest,
+
     }}>
       {children}
     </MyContext.Provider>

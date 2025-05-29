@@ -104,17 +104,18 @@ export const updateUserProfile = async ({ user_id, first_name, last_name, city, 
 
 
 //send request
-export const sendProductRequest = async ({ user, product }) => {
+export const sendProductRequest = async ({ user, products }) => {
   const form = new FormData();
   form.append('action', 'app_product_request');
   form.append('user', JSON.stringify(user));
-  form.append('product', JSON.stringify(product));
+  form.append('products', JSON.stringify(products));
 
   const res = await fetch(`${WP_SITE_URL}/wp-admin/admin-ajax.php`, {
     method: 'POST',
     body: form,
   });
+
   const data = await res.json();
-  if (!data.success) throw new Error(data.data || 'Ошибка отправки');
+  if (!data.success) throw new Error(data.data || 'Ошибка отправки заявки');
   return data;
 };

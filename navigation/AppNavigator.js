@@ -14,6 +14,7 @@ import FavoritesScreen from '../screens/FavoritesScreen';
 import AuthComponent from '../screens/AuthComponent';
 import FooterBar from '../screens/FooterBar';
 import { StatusBar } from 'expo-status-bar';
+import RequestScreen from '../screens/RequestScreen';
 import NewProductsScreen from '../screens/NewProductsScreen';
 import { TouchableOpacity, View, Text, StyleSheet, Linking, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -195,6 +196,27 @@ function ProfileStack() {
 }
 
 
+function RequestStack() {
+  return (
+    <>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="RequestScreen"
+          component={RequestScreen}
+          options={({ navigation }) => ({
+            headerShown: false,
+            headerTitle: 'Заявка',
+            headerRight: () => <IconsView navigation={navigation} />,
+            headerLeft: () => <IconsMenu navigation={navigation} />,
+          })}
+        />
+      </Stack.Navigator>
+      <FooterBar />
+    </>
+  );
+}
+
+
 
 function MainStack() {
   const { user } = useContext(MyContext);
@@ -262,6 +284,16 @@ function MainStack() {
     headerLeft: () => <IconsMenu navigation={navigation} />,
   })}
 />
+<Stack.Screen
+  name="CategoriesScreen"
+  component={require('../screens/CategoriesScreen').default}
+  options={({ navigation }) => ({
+    headerShown: false,
+    title: 'Каталог',
+    headerRight: () => <IconsView navigation={navigation} />,
+    headerLeft: () => <IconsMenu navigation={navigation} />,
+  })}
+/>
       {/* Здесь больше нет дублирующего "Авторизация" */}
     </Stack.Navigator>
     <FooterBar /></>
@@ -299,11 +331,14 @@ function CustomDrawerContent(props) {
   // Меню для Drawer
   const menu = [
     { label: 'Главная', icon: 'home-outline', screen: 'Главная' },
+    { label: 'Каталог', icon: 'grid-outline', screen: 'CategoriesScreen' },
     { label: 'Доставка', icon: 'car-outline', screen: 'Доставка' },
     { label: 'О нас/Контакты', icon: 'information-circle-outline', screen: 'О нас/Контакты' },
     !user && { label: 'Авторизация', icon: 'log-in-outline', screen: 'Авторизация' },
     user && { label: 'Профиль', icon: 'person-outline', screen: 'Профиль' },
     user && { label: 'Хочу купить', icon: 'heart-outline', screen: 'Хочу купить' },
+    user && { label: 'Заявка на товары', icon: 'document-text-outline', screen: 'Заявки' },
+    
   ].filter(Boolean);
 
   return (
@@ -387,7 +422,7 @@ export default function AppNavigator({navigation}) {
   return (
     <>
    
-<StatusBar style="light" backgroundColor="#191B22" />
+<StatusBar style="light"  />
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
      screenOptions={{
@@ -403,6 +438,8 @@ export default function AppNavigator({navigation}) {
       {!user && <Drawer.Screen name="Авторизация" component={AuthStack} />}
       {user && <Drawer.Screen name="Профиль" component={ProfileStack} />}
        {user && <Drawer.Screen name="Хочу купить" component={FavoritesStack} />}
+       {user && <Drawer.Screen name="Заявки" component={RequestStack} />}
+
     </Drawer.Navigator>
    
     </>

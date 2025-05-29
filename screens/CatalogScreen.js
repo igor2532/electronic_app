@@ -1,12 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, FlatList, StyleSheet, Text, Modal, TouchableOpacity, ActivityIndicator, Dimensions, ScrollView, Button } from 'react-native';
+import { View, FlatList, StyleSheet, Text,  TouchableOpacity, ActivityIndicator, Dimensions, ScrollView, Button } from 'react-native';
 import { api } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import Animated, { FadeInUp } from 'react-native-reanimated';
-import RangeSlider from 'rn-range-slider';
 import { MyContext } from '../navigation/Context';
-import { Skeleton } from '@motify/skeleton';
+import { Skeleton } from 'moti/skeleton';
 import ProductsSkeleton from '../components/ProductsSkeleton';
+import { Ionicons } from '@expo/vector-icons';
+import Modal from 'react-native-modal';
+import Slider from '@react-native-community/slider';
 const screenWidth = Dimensions.get('window').width;
 const ITEM_MARGIN = 12;
 const ITEM_WIDTH = (screenWidth - 3 * ITEM_MARGIN) / 2;
@@ -15,7 +17,12 @@ const Thumb = () => <View style={styles.thumb} />;
 const Rail = () => <View style={styles.rail} />;
 const RailSelected = () => <View style={styles.railSelected} />;
 const Notch = () => <View style={styles.notch} />;
-const Label = ({ text }) => <Text style={styles.label}>{text}</Text>;
+const Label = ({ text }) => (
+  <View style={{ alignItems: 'center' }}>
+    <Text style={styles.label}>{text}</Text>
+  </View>
+);
+
 
 export default function CatalogScreen({ route, navigation }) {
      const {
@@ -33,15 +40,18 @@ export default function CatalogScreen({ route, navigation }) {
   const [products, setProducts] = useState([]);
   const [loadedProducts, setLoadProducts] = useState(false);
   const [page, setPage] = useState(1);
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(10000);
+
   const [selectedCategories, setSelectedCategories] = useState(categoryId ? [categoryId] : []);
   const [categories, setCategories] = useState([]);
   const [attributes, setAttributes] = useState([]);
   const [selectedAttributes, setSelectedAttributes] = useState({});
-  const [filterVisible, setFilterVisible] = useState(false);
+ const [filterVisible, setFilterVisible] = useState(false);
+  const [minPrice, setMinPrice] = useState(0);
+  const [tempMin, setTempMin] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(50000);
+  const [tempMax, setTempMax] = useState(50000);
   // const [categoryTitle, setCategoryTitle] = useState('Каталог');
-
+const [sortBy, setSortBy] = useState('date');
 
 
 
@@ -57,7 +67,25 @@ export default function CatalogScreen({ route, navigation }) {
       page: reset ? 1 : page,
       per_page: 20,
     };
-
+if (sortBy === 'price_asc') {
+  params.orderby = 'price';
+  params.order = 'asc';
+} else if (sortBy === 'price_desc') {
+  params.orderby = 'price';
+  params.order = 'desc';
+} else if (sortBy === 'name') {
+  params.orderby = 'title';
+  params.order = 'asc';
+} else if (sortBy === 'name_desc') {
+  params.orderby = 'title';
+  params.order = 'desc';
+} else if (sortBy === 'date_desc') {
+  params.orderby = 'date';
+  params.order = 'desc';
+} else {
+  params.orderby = 'date';
+  params.order = 'asc';
+}
     api.get(`/products?${new URLSearchParams(params).toString()}&${attributeQuery.join('&')}`)
       .then(res => {
         if (reset) {
@@ -108,23 +136,180 @@ export default function CatalogScreen({ route, navigation }) {
   );
 
   return (
+   
     <View style={styles.root}>
- 
+       
+
+     <Modal isVisible={filterVisible} useNativeDriver={false} propagateSwipe={true}
+        onBackdropPress={() => setFilterVisible(false)}
+        style={{ justifyContent: 'flex-end', margin: 0 }}
+      >
+        <View style={{ backgroundColor: '#1e1f26', borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20 }}>
+          <View style={{ width: 40, height: 4, backgroundColor: '#555', alignSelf: 'center', borderRadius: 2, marginBottom: 12 }} />
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#fff', marginBottom: 18 }}>Фильтр</Text>
+          <Text style={{ fontSize: 15, color: '#bbb', marginBottom: 8 }}>Цена: {minPrice} BYN – {maxPrice} BYN</Text>
+
+          <View style={{
+            width: screenWidth - 60,
+            alignSelf: 'center',
+            marginTop: 20,
+            marginBottom: 20,
+            backgroundColor: '#2a2b32',
+            paddingVertical: 16,
+            paddingHorizontal: 10,
+            borderRadius: 12
+          }}>
+            <Text style={{ color: '#bbb', fontSize: 14, marginBottom: 6 }}>
+              Мин. цена: {tempMin} BYN
+            </Text>
+            <Slider
+              minimumValue={0}
+              maximumValue={50000}
+              step={10}
+              value={minPrice}
+              onValueChange={value => setTempMin(value)}
+              onSlidingComplete={value => setMinPrice(value)}
+              minimumTrackTintColor="#1E90FF"
+              maximumTrackTintColor="#444"
+              thumbTintColor="#1E90FF"
+            />
+
+            <Text style={{ color: '#bbb', fontSize: 14, marginTop: 20, marginBottom: 6 }}>
+              Макс. цена: {tempMax} BYN
+            </Text>
+            <Slider
+              minimumValue={0}
+              maximumValue={50000}
+              step={10}
+              value={maxPrice}
+              onValueChange={value => setTempMax(value)}
+              onSlidingComplete={value => setMaxPrice(value)}
+              minimumTrackTintColor="#1E90FF"
+              maximumTrackTintColor="#444"
+              thumbTintColor="#1E90FF"
+            />
+          </View>
+
+          <TouchableOpacity
+            onPress={() => setFilterVisible(false)}
+            style={{ backgroundColor: '#1E90FF', paddingVertical: 14, borderRadius: 12, marginTop: 28 }}>
+            <Text style={{ color: '#fff', textAlign: 'center', fontSize: 16, fontWeight: 'bold' }}>Применить</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+
+{!loadedProducts ? (
+  <View style={{ paddingHorizontal: 20, paddingTop: 20 }}>
+    {[...Array(6)].map((_, i) => (
+      <View
+        key={i}
+        style={{
+          height: 150,
+          backgroundColor: '#2a2b32',
+          borderRadius: 16,
+          marginBottom: 12,
+          opacity: 0.3,
+        }}
+      />
+    ))}
+  </View>
+) : (
+
       <FlatList
         data={products}
         keyExtractor={item => item.id.toString()}
         renderItem={renderProduct}
+ListEmptyComponent={null}
+ListHeaderComponent={() => (
+<View style={{ paddingHorizontal: 20, paddingTop: 20, marginBottom: 20 }}>
+  <Text style={{ fontSize: 22, color: '#fff', fontWeight: 'bold', marginBottom: 12 }}>
+    {categoryTitle || 'Категория'}
+  </Text>
 
- ListHeaderComponent={() => (
-        <View style={{ padding: 20, }}>
-           <Text style={{ fontSize: 22, color:'#fff', textAlign:'center', fontWeight:'bold' }}>{categoryTitle}</Text>
-        </View>
-      )}
+  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+      <TouchableOpacity
+onPress={() => {
+  setSortBy(prev => prev === 'date' ? 'date_desc' : 'date');
+  setLoadProducts(false);
+  setTimeout(() => loadProducts(true), 100);
+}}
 
+        style={{
+          paddingHorizontal: 12,
+          paddingVertical: 6,
+          borderRadius: 20,
+          backgroundColor: sortBy.includes('date') ? '#1E90FF' : '#2a2b32',
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginRight: 8
+        }}
+      >
+        <Text style={{ color: '#fff', fontSize: 12 }}>🕓</Text>
+        <Text style={{ color: '#fff', marginLeft: 4 }}>{sortBy === 'date_desc' ? '↓' : '↑'}</Text>
+      </TouchableOpacity>
 
-        // numColumns={2}
-        // columnWrapperStyle={styles.row}
+      <TouchableOpacity
+     onPress={() => {
+  setSortBy(prev => prev === 'name' ? 'name_desc' : 'name');
+  setLoadProducts(false);
+  setTimeout(() => loadProducts(true), 100);
+}}
 
+        style={{
+          paddingHorizontal: 12,
+          paddingVertical: 6,
+          borderRadius: 20,
+          backgroundColor: sortBy.includes('name') ? '#1E90FF' : '#2a2b32',
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginRight: 8
+        }}
+      >
+        <Text style={{ color: '#fff', fontSize: 12 }}>A-Я</Text>
+        <Text style={{ color: '#fff', marginLeft: 4 }}>{sortBy === 'name_desc' ? '↓' : '↑'}</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+onPress={() => {
+  setSortBy(prev => prev === 'price_asc' ? 'price_desc' : 'price_asc');
+  setLoadProducts(false);
+  setTimeout(() => loadProducts(true), 100);
+}}
+
+        style={{
+          paddingHorizontal: 12,
+          paddingVertical: 6,
+          borderRadius: 20,
+          backgroundColor: sortBy.includes('price') ? '#1E90FF' : '#2a2b32',
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginRight: 8
+        }}
+      >
+        <Text style={{ color: '#fff', fontSize: 12 }}>₽</Text>
+        <Text style={{ color: '#fff', marginLeft: 4 }}>{sortBy === 'price_desc' ? '↓' : '↑'}</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => setFilterVisible(true)}
+        style={{
+          paddingHorizontal: 12,
+          paddingVertical: 6,
+          borderRadius: 20,
+          backgroundColor: '#2a2b32',
+          flexDirection: 'row',
+          alignItems: 'center'
+        }}
+      >
+        <Ionicons name="filter-outline" size={18} color="#fff" />
+        <Text style={{ color: '#fff', fontSize: 12, marginLeft: 6 }}>Фильтр</Text>
+      </TouchableOpacity>
+    </View>
+  </ScrollView>
+</View>
+)}
  key={numColumns}
        numColumns={numColumns}
   columnWrapperStyle={{
@@ -145,6 +330,9 @@ export default function CatalogScreen({ route, navigation }) {
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
       />
+
+)}
+
       {products.length > 0 && (
         <ActivityIndicator style={{ display: loadedProducts ? 'none' : 'flex' }} size="large" color="#1E90FF" />
       )}
@@ -152,71 +340,11 @@ export default function CatalogScreen({ route, navigation }) {
         <Button color="#1E90FF" title="Загрузить еще" onPress={() => { setLoadProducts(false); loadProducts(); }} />
       )}
 
-      <Modal visible={filterVisible} animationType="slide">
-        <ScrollView contentContainerStyle={styles.modalContent}>
-          <Text style={styles.filterTitle}>Фильтр по категориям</Text>
-          <ScrollView horizontal>
-            {categories.map(cat => (
-              <Button
-                key={cat.id}
-                title={cat.name}
-                color={selectedCategories.includes(cat.id) ? '#1E90FF' : '#444'}
-                onPress={() => setSelectedCategories(prev => prev.includes(cat.id) ? prev.filter(c => c !== cat.id) : [...prev, cat.id])}
-              />
-            ))}
-          </ScrollView>
-          <Text style={styles.filterTitle}>Цена: {minPrice} ₽ - {maxPrice} ₽</Text>
-          <RangeSlider
-            min={0}
-            max={50000}
-            fromValue={minPrice}
-            toValue={maxPrice}
-            onValueChanged={(from, to) => {
-              setMinPrice(from);
-              setMaxPrice(to);
-            }}
-            renderThumb={Thumb}
-            renderRail={Rail}
-            renderRailSelected={RailSelected}
-            renderLabel={Label}
-            renderNotch={Notch}
-          />
 
-          {attributes.map(attr => (
-            attr.terms?.length > 0 && (
-              <View key={attr.id} style={{ marginVertical: 10 }}>
-                <Text style={styles.filterTitle}>{attr.name}</Text>
-                <View style={styles.attrWrap}>
-                  {attr.terms.map(term => (
-                    <TouchableOpacity
-                      key={term.id}
-                      style={[
-                        styles.attrBtn,
-                        (selectedAttributes[attr.slug] || []).includes(term.name) && styles.attrBtnSelected
-                      ]}
-                      onPress={() => {
-                        setSelectedAttributes(prev => {
-                          const values = prev[attr.slug] || [];
-                          return {
-                            ...prev,
-                            [attr.slug]: values.includes(term.name)
-                              ? values.filter(v => v !== term.name)
-                              : [...values, term.name],
-                          };
-                        });
-                      }}>
-                      <Text>{term.name}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            )
-          ))}
 
-          <Button title="Применить" onPress={() => setFilterVisible(false)} />
-        </ScrollView>
-      </Modal>
+
     </View>
+    
   );
 }
 
@@ -295,6 +423,22 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: ITEM_MARGIN },
   productWrap: {  marginBottom: ITEM_MARGIN, backgroundColor: 'transparent' },
   productCardCustom: { backgroundColor: DARK_CARD, borderRadius: 16, overflow: 'hidden' },
+  sortBtn: {
+  color: '#bbb',
+  fontSize: 14,
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 8,
+  backgroundColor: '#2a2b32',
+  overflow: 'hidden',
+  marginHorizontal: 4
+},
+sortActive: {
+  color: '#fff',
+  backgroundColor: '#1E90FF',
+  fontWeight: 'bold'
+},
+
 });
 
 

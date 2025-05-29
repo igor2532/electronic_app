@@ -2,14 +2,16 @@ import React, { useContext } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { FavoritesContext } from '../navigation/FavoritesContext';
-
+import { MyContext } from '../navigation/Context';
 export default function ProductCard({ product, onPress, style }) {
   const { addFavorite, removeFavorite, isFavorite } = useContext(FavoritesContext);
   const fav = isFavorite(product.id);
 
   // Найти имя первой категории
   const categoryName = product.categories?.[0]?.name || '';
-
+const { addToRequest, requestItems } = useContext(MyContext);
+const currentItem = requestItems.find(p => p.id === product.id);
+const quantity = currentItem?.qty || 0;
   return (
     <TouchableOpacity style={[styles.card, style]} onPress={onPress} activeOpacity={0.9}>
       {/* Сердечко справа вверху */}
@@ -36,6 +38,28 @@ export default function ProductCard({ product, onPress, style }) {
         <Text style={styles.category} numberOfLines={1}>{categoryName}</Text>
       )}
       <Text style={styles.price}>{product.price} BYN</Text>
+
+
+<TouchableOpacity
+  onPress={() => addToRequest(product)}
+  style={{
+    backgroundColor: quantity > 0 ? '#1E90FF' : '#F9227F',
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginTop: 6,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  }}
+>
+  <Ionicons name="document-text-outline" size={18} color="#fff" style={{ marginRight: 6 }} />
+  <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 13 }}>
+    {quantity > 0 ? `В заявке (${quantity})` : 'В заявку'}
+  </Text>
+</TouchableOpacity>
+
+
+
     </TouchableOpacity>
   );
 }

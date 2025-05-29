@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView, Modal, Pressable, StyleSheet, Linking, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Image, ScrollView, Modal, Pressable, StyleSheet, Linking, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MyContext } from '../navigation/Context';
@@ -9,12 +9,13 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function ProductDetailsScreen({ route, navigation }) {
   const { product } = route.params;
-  const { user } = useContext(MyContext);
+  const { user, addToRequest, requestItems } = useContext(MyContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [activeImage, setActiveImage] = useState(null);
   const [sending, setSending] = useState(false);
   const { addFavorite, removeFavorite, isFavorite } = useContext(FavoritesContext);
   const fav = isFavorite(product.id);
+  const quantity = requestItems.find(p => p.id === product.id)?.qty || 0;
 
   useEffect(() => {
     navigation.setOptions({
@@ -42,8 +43,7 @@ export default function ProductDetailsScreen({ route, navigation }) {
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#191B22' }}>
-      <ScrollView contentContainerStyle={{ padding: 0, backgroundColor: '#191B22' ,paddingBottom:50}}>
-        {/* Слайдер изображений */}
+      <ScrollView contentContainerStyle={{ padding: 0, backgroundColor: '#191B22', paddingBottom: 50 }}>
         <View style={styles.swiperWrap}>
           <Swiper
             showsPagination
@@ -56,7 +56,6 @@ export default function ProductDetailsScreen({ route, navigation }) {
               </Pressable>
             ))}
           </Swiper>
-          {/* Сердечко избранного */}
           <TouchableOpacity
             onPress={() => fav ? removeFavorite(product.id) : addFavorite(product)}
             style={styles.heartBtn}
@@ -69,18 +68,25 @@ export default function ProductDetailsScreen({ route, navigation }) {
             />
           </TouchableOpacity>
         </View>
-        {/* Описание и цены */}
+
         <View style={styles.content}>
           <Text style={styles.title}>{product.name}</Text>
           <Text style={styles.price}>{product.price} BYN</Text>
           {!!product.description && (
-            <Text style={styles.desc}>
-              {product.description.replace(/<[^>]+>/g, '')}
-            </Text>
+            <Text style={styles.desc}>{product.description.replace(/<[^>]+>/g, '')}</Text>
           )}
           <Text style={styles.shopTitle}>ЧТУП »ТЕХНОИВЬЕ»</Text>
           <Text style={styles.rassrochka}>Рассрочка без переплат до 6 месяцев</Text>
           <Text style={styles.address}>г. Ивье, ул. Красноармейская, д. 2, каб. 15</Text>
+
+          <TouchableOpacity
+            style={[styles.requestBtn, { backgroundColor: '#F9227F', marginBottom: 12 }]}
+            onPress={() => addToRequest(product)}
+          >
+            <Text style={styles.requestBtnText}>
+              {quantity > 0 ? `В ЗАЯВКЕ (${quantity})` : 'ДОБАВИТЬ В ЗАЯВКУ'}
+            </Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.phoneBtn}
@@ -102,7 +108,6 @@ export default function ProductDetailsScreen({ route, navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Характеристики */}
         <Text style={styles.sectionTitle}>Характеристики:</Text>
         <View style={styles.table}>
           {product.attributes.map(attr => (
@@ -113,7 +118,7 @@ export default function ProductDetailsScreen({ route, navigation }) {
           ))}
         </View>
       </ScrollView>
-      {/* Увеличение картинки */}
+
       <Modal visible={modalVisible} transparent>
         <Pressable style={{ flex: 1, backgroundColor: '#000' }} onPress={() => setModalVisible(false)}>
           <Image source={{ uri: activeImage }} style={{ flex: 1, resizeMode: 'contain' }} />
@@ -122,6 +127,7 @@ export default function ProductDetailsScreen({ route, navigation }) {
     </GestureHandlerRootView>
   );
 }
+
 
 const styles = StyleSheet.create({
   swiperWrap: {
