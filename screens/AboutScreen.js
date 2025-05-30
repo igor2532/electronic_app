@@ -133,6 +133,16 @@ export default function AboutScreen({ navigation }) {
         <Text style={styles.item}>УНП 590191596</Text>
         <Text style={styles.item}>Торговый реестр №333340 от 11.10.2017</Text>
       </Animatable.View>
+      <Animatable.View animation="fadeInUp" delay={1200} style={styles.block}>
+  <Text style={styles.blockTitle}>⚠️ Важно знать</Text>
+  <Text style={styles.item}>
+    Это приложение не является интернет-магазином. Цены, указанные в каталоге, носят справочный характер и не являются публичной офертой.
+  </Text>
+  <Text style={styles.item}>
+    Оформление заявки через приложение не считается покупкой. Все детали и условия согласовываются по телефону или при визите в магазин.
+  </Text>
+</Animatable.View>
+
     </ScrollView>
   );
 }
